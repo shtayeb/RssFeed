@@ -8,9 +8,11 @@ import (
 	"time"
 
 	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
 	"github.com/shtayeb/rssfeed/internal/database"
+	"github.com/shtayeb/rssfeed/views"
 
 	_ "github.com/lib/pq"
 )
@@ -53,24 +55,42 @@ func main() {
 		MaxAge:           300,
 	}))
 
-	v1Router := chi.NewRouter()
+	router.Use(middleware.Logger)
 
-	v1Router.Post("/users", apiCfg.handlerUsersCreate)
-	// v1Router.Get("/users", apiCfg.middlewareAuth(apiCfg.handlerUsersGet))
+	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		// templ.Handler(views.NotFoundComponent()).ServeHTTP(w, r)
+		views.Landing().Render(r.Context(), w)
 
-	// v1Router.Post("/feeds", apiCfg.middlewareAuth(apiCfg.handlerFeedCreate))
-	v1Router.Get("/feeds", apiCfg.handlerGetFeeds)
+	})
 
-	// v1Router.Get("/feed_follows", apiCfg.middlewareAuth(apiCfg.handlerFeedFollowsGet))
-	// v1Router.Post("/feed_follows", apiCfg.middlewareAuth(apiCfg.handlerFeedFollowCreate))
-	// v1Router.Delete("/feed_follows/{feedFollowID}", apiCfg.middlewareAuth(apiCfg.handlerFeedFollowDelete))
+	router.Get("/home", func(w http.ResponseWriter, r *http.Request) {
+		views.Home().Render(r.Context(), w)
+	})
 
-	// v1Router.Get("/posts", apiCfg.middlewareAuth(apiCfg.handlerPostsGet))
+	router.Get("/login", func(w http.ResponseWriter, r *http.Request) {
+		views.Login().Render(r.Context(), w)
+	})
+	router.Get("/register", func(w http.ResponseWriter, r *http.Request) {
+		views.Register().Render(r.Context(), w)
+	})
 
-	v1Router.Get("/healthz", handlerReadiness)
-	v1Router.Get("/err", handlerErr)
+	// views.Register().Render(r.Context(), w)
 
-	router.Mount("/v1", v1Router)
+	router.Post("/register", apiCfg.handlerUsersCreate)
+	// router.Get("/users", apiCfg.middlewareAuth(apiCfg.handlerUsersGet))
+
+	// router.Post("/feeds", apiCfg.middlewareAuth(apiCfg.handlerFeedCreate))
+	router.Get("/feeds", apiCfg.handlerGetFeeds)
+
+	// router.Get("/feed_follows", apiCfg.middlewareAuth(apiCfg.handlerFeedFollowsGet))
+	// router.Post("/feed_follows", apiCfg.middlewareAuth(apiCfg.handlerFeedFollowCreate))
+	// router.Delete("/feed_follows/{feedFollowID}", apiCfg.middlewareAuth(apiCfg.handlerFeedFollowDelete))
+
+	// router.Get("/posts", apiCfg.middlewareAuth(apiCfg.handlerPostsGet))
+
+	router.Get("/healthz", handlerReadiness)
+	router.Get("/err", handlerErr)
+
 	srv := &http.Server{
 		Addr:    ":" + port,
 		Handler: router,

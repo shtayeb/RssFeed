@@ -11,9 +11,15 @@ import (
 
 func (cfg *apiConfig) handlerUsersCreate(w http.ResponseWriter, r *http.Request) {
 	type parameters struct {
-		Name string
+		Name                 string
+		Username             string
+		Email                string
+		Password             string
+		PasswordConfirmation string
 	}
+
 	decoder := json.NewDecoder(r.Body)
+
 	params := parameters{}
 	err := decoder.Decode(&params)
 	if err != nil {
