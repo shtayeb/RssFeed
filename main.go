@@ -74,8 +74,6 @@ func main() {
 		views.Register().Render(r.Context(), w)
 	})
 
-	// views.Register().Render(r.Context(), w)
-
 	router.Post("/register", apiCfg.handlerUsersCreate)
 	// router.Get("/users", apiCfg.middlewareAuth(apiCfg.handlerUsersGet))
 

@@ -31,7 +31,7 @@ templ Login() {
 							class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
 							id="email"
 							placeholder="m@example.com"
-							required=""
+							required
 						/>
 						<button type="submit" class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 w-full bg-black text-white">
 							<div class="flex items-center justify-center">
@@ -73,7 +73,9 @@ templ Login() {
 templ Register() {
 	@layout() {
 		<div class="bg-gray-100 min-h-screen flex items-center justify-center">
+		
 			<div class="max-w-sm rounded-lg shadow-lg bg-white p-6 space-y-6 border border-gray-200 dark:border-gray-700">
+				
 				<div class="space-y-2 text-center">
 					<h1 class="text-3xl font-bold">Register</h1>
 					<p class="text-zinc-500 dark:text-zinc-400">
@@ -88,12 +90,15 @@ templ Register() {
 						.
 					</p>
 				</div>
-				<form class="space-y-4" method="POST">
+
+				<div id="messages" class="bg-green-100 px-5 py-3"></div>
+				
+				<form class="space-y-4" method="POST" hx-post="/register" hx-trigger="submit" hx-target="#messages" hx-swap="outerHTML" >
 					<div class="space-y-2">
                     <div>
 							<label
 								class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-								for="email"
+								for="name"
 							>
 								Name
 							</label>
@@ -101,8 +106,10 @@ templ Register() {
 								type="text"
 								class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
 								id="name"
+								name="name"
+								value=""
 								placeholder="John Doe"
-								required
+							
 							/>
 						</div>
 						<div>
@@ -116,14 +123,16 @@ templ Register() {
 								type="email"
 								class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
 								id="email"
+								name="email"
+								value=""
 								placeholder="m@example.com"
-								required
+								
 							/>
 						</div>
 						<div>
 							<label
 								class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-								for="email"
+								for="username"
 							>
 								Username
 							</label>
@@ -131,38 +140,44 @@ templ Register() {
 								type="username"
 								class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
 								id="username"
+								name="username"
+								value=""
 								placeholder="example"
-								required
+								
 							/>
 						</div>
 						<div>
 							<label
 								class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-								for="email"
+								for="password"
 							>
 								Password
 							</label>
 							<input
 								type="password"
+								name="password"
+								value=""
 								class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
 								id="password"
 								placeholder="example"
-								required
+								
 							/>
 						</div>
 						<div>
 							<label
 								class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-								for="email"
+								for="password_confirmation"
 							>
 								Confirm Password
 							</label>
 							<input
 								type="password"
+								name="password_confirmation"
 								class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
 								id="password_confirmation"
 								placeholder="example"
-								required
+								value=""
+								
 							/>
 						</div>
 						<button type="submit" class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 w-full bg-black text-white">

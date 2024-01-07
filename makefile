@@ -5,3 +5,12 @@ migrate:
 .PHONY: sqlc-generate
 sqlc-generate:
 	sqlc generate
+
+
+.PHONY: t-watch
+t-watch:
+	templ generate -watch
+
+.PHONY: serve
+serve:
+	air
