@@ -6,26 +6,26 @@ import (
 	"net/http"
 )
 
-func respondWithErr(w http.ResponseWriter, code int, msg string) {
+func respondWithError(w http.ResponseWriter, code int, msg string) {
 	if code > 499 {
-		log.Printf("Responding to 5xx error: %v", msg)
+		log.Printf("Responding with 5XX error: %s", msg)
 	}
-	type errResponse struct {
+	type errorResponse struct {
 		Error string `json:"error"`
 	}
-	respondWithJson(w, code, errResponse{
+	respondWithJSON(w, code, errorResponse{
 		Error: msg,
 	})
 }
 
-func respondWithJson(w http.ResponseWriter, code int, payload interface{}) {
+func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
+	w.Header().Set("Content-Type", "application/json")
 	dat, err := json.Marshal(payload)
 	if err != nil {
-		log.Printf("failed to marshal json data %v", payload)
+		log.Printf("Error marshalling JSON: %s", err)
 		w.WriteHeader(500)
 		return
 	}
-	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(code)
 	w.Write(dat)
 }
