@@ -1,4 +1,4 @@
-package main
+package handlers
 
 import (
 	"encoding/json"
@@ -8,19 +8,20 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/shtayeb/rssfeed/internal/database"
+	"github.com/shtayeb/rssfeed/internal/models"
 )
 
-func (cfg *apiConfig) handlerFeedFollowsGet(w http.ResponseWriter, r *http.Request, user database.User) {
+func (cfg *ApiConfig) HandlerFeedFollowsGet(w http.ResponseWriter, r *http.Request, user database.User) {
 	feedFollows, err := cfg.DB.GetFeedFollowsForUser(r.Context(), user.ID)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Couldn't create feed follow")
 		return
 	}
 
-	respondWithJSON(w, http.StatusOK, databaseFeedFollowsToFeedFollows(feedFollows))
+	respondWithJSON(w, http.StatusOK, models.DatabaseFeedFollowsToFeedFollows(feedFollows))
 }
 
-func (cfg *apiConfig) handlerFeedFollowCreate(w http.ResponseWriter, r *http.Request, user database.User) {
+func (cfg *ApiConfig) HandlerFeedFollowCreate(w http.ResponseWriter, r *http.Request, user database.User) {
 	type parameters struct {
 		FeedID int32
 	}
@@ -43,10 +44,10 @@ func (cfg *apiConfig) handlerFeedFollowCreate(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	respondWithJSON(w, http.StatusOK, databaseFeedFollowToFeedFollow(feedFollow))
+	respondWithJSON(w, http.StatusOK, models.DatabaseFeedFollowToFeedFollow(feedFollow))
 }
 
-func (cfg *apiConfig) handlerFeedFollowDelete(w http.ResponseWriter, r *http.Request, user database.User) {
+func (cfg *ApiConfig) HandlerFeedFollowDelete(w http.ResponseWriter, r *http.Request, user database.User) {
 	feedFollowID, err := strconv.Atoi(chi.URLParam(r, "feedFollowID"))
 
 	if err != nil {

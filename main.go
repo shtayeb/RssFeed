@@ -7,19 +7,17 @@ import (
 	"os"
 	"time"
 
+	"github.com/a-h/templ"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
+	"github.com/shtayeb/rssfeed/handlers"
 	"github.com/shtayeb/rssfeed/internal/database"
 	"github.com/shtayeb/rssfeed/views"
 
 	_ "github.com/lib/pq"
 )
-
-type apiConfig struct {
-	DB *database.Queries
-}
 
 func main() {
 	godotenv.Load(".env")
@@ -40,7 +38,7 @@ func main() {
 	}
 	dbQueries := database.New(db)
 
-	apiCfg := apiConfig{
+	apiCfg := handlers.ApiConfig{
 		DB: dbQueries,
 	}
 
@@ -63,22 +61,20 @@ func main() {
 
 	})
 
-	router.Get("/home", func(w http.ResponseWriter, r *http.Request) {
-		views.Home().Render(r.Context(), w)
-	})
+	router.Get("/home", templ.Handler(views.Home()).ServeHTTP)
 
 	router.Get("/login", func(w http.ResponseWriter, r *http.Request) {
 		views.Login().Render(r.Context(), w)
 	})
 	router.Get("/register", func(w http.ResponseWriter, r *http.Request) {
-		views.Register().Render(r.Context(), w)
+		views.Register([]string{}, map[string]string{}).Render(r.Context(), w)
 	})
 
-	router.Post("/register", apiCfg.handlerUsersCreate)
+	router.Post("/register", apiCfg.HandlerUsersCreate)
 	// router.Get("/users", apiCfg.middlewareAuth(apiCfg.handlerUsersGet))
 
 	// router.Post("/feeds", apiCfg.middlewareAuth(apiCfg.handlerFeedCreate))
-	router.Get("/feeds", apiCfg.handlerGetFeeds)
+	router.Get("/feeds", apiCfg.HandlerGetFeeds)
 
 	// router.Get("/feed_follows", apiCfg.middlewareAuth(apiCfg.handlerFeedFollowsGet))
 	// router.Post("/feed_follows", apiCfg.middlewareAuth(apiCfg.handlerFeedFollowCreate))
@@ -86,8 +82,8 @@ func main() {
 
 	// router.Get("/posts", apiCfg.middlewareAuth(apiCfg.handlerPostsGet))
 
-	router.Get("/healthz", handlerReadiness)
-	router.Get("/err", handlerErr)
+	router.Get("/healthz", handlers.HandlerReadiness)
+	router.Get("/err", handlers.HandlerErr)
 
 	srv := &http.Server{
 		Addr:    ":" + port,

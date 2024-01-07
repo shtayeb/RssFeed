@@ -1,7 +1,8 @@
 package views
 
+
 templ Login() {
-	@layout() {
+	@bareLayout() {
 		<div class="bg-gray-100 min-h-screen flex items-center justify-center">
 			<div class="max-w-sm rounded-lg shadow-lg bg-white p-6 space-y-6 border border-gray-200 dark:border-gray-700">
 				<div class="space-y-2 text-center">
@@ -70,12 +71,10 @@ templ Login() {
 	}
 }
 
-templ Register() {
-	@layout() {
+templ Register(messages []string, errors map[string]string) {
+	@bareLayout() {
 		<div class="bg-gray-100 min-h-screen flex items-center justify-center">
-		
 			<div class="max-w-sm rounded-lg shadow-lg bg-white p-6 space-y-6 border border-gray-200 dark:border-gray-700">
-				
 				<div class="space-y-2 text-center">
 					<h1 class="text-3xl font-bold">Register</h1>
 					<p class="text-zinc-500 dark:text-zinc-400">
@@ -90,12 +89,16 @@ templ Register() {
 						.
 					</p>
 				</div>
-
-				<div id="messages" class="bg-green-100 px-5 py-3"></div>
-				
-				<form class="space-y-4" method="POST" hx-post="/register" hx-trigger="submit" hx-target="#messages" hx-swap="outerHTML" >
+				if len(messages) != 0 {
+					<div id="messages" class="bg-green-100 px-5 py-3">
+						for _, msg := range messages {
+							<p>{ msg } </p>
+						}
+					</div>
+				}
+				<form class="space-y-4" method="POST" action="/register">
 					<div class="space-y-2">
-                    <div>
+						<div>
 							<label
 								class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
 								for="name"
@@ -109,8 +112,12 @@ templ Register() {
 								name="name"
 								value=""
 								placeholder="John Doe"
-							
 							/>
+							<p class="text-red-400 text-xs py-1">
+								if errors["Name"] != "" {
+									{errors["Name"]}
+								}	
+							</p>
 						</div>
 						<div>
 							<label
@@ -126,8 +133,12 @@ templ Register() {
 								name="email"
 								value=""
 								placeholder="m@example.com"
-								
 							/>
+							<p class="text-red-400 text-xs py-1">
+								if errors["Email"] != "" {
+									{errors["Email"]}
+								}	
+							</p>
 						</div>
 						<div>
 							<label
@@ -143,8 +154,12 @@ templ Register() {
 								name="username"
 								value=""
 								placeholder="example"
-								
 							/>
+							<p class="text-red-400 text-xs py-1">
+								if errors["Username"] != "" {
+									{errors["Username"]}
+								}	
+							</p>
 						</div>
 						<div>
 							<label
@@ -160,8 +175,12 @@ templ Register() {
 								class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
 								id="password"
 								placeholder="example"
-								
 							/>
+							<p class="text-red-400 text-xs py-1">
+								if errors["Password"] != "" {
+									{errors["Password"]}
+								}	
+							</p>
 						</div>
 						<div>
 							<label
@@ -177,7 +196,6 @@ templ Register() {
 								id="password_confirmation"
 								placeholder="example"
 								value=""
-								
 							/>
 						</div>
 						<button type="submit" class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 w-full bg-black text-white">

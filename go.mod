@@ -13,4 +13,5 @@ require (
 	github.com/go-chi/cors v1.2.1 // indirect
 	github.com/lib/pq v1.10.9
 	github.com/mattn/go-sqlite3 v1.14.19 // indirect
+	golang.org/x/crypto v0.17.0
 )

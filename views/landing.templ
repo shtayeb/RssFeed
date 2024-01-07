@@ -38,6 +38,34 @@ templ footer() {
 	</footer>
 }
 
+templ bareLayout() {
+	<!DOCTYPE html>
+	<html class="">
+		<head>
+			<title>RSS Feed</title>
+			<script src="https://unpkg.com/htmx.org@1.9.5" type="text/javascript"></script>
+			<script src="https://cdn.tailwindcss.com"></script>
+			<script>
+				tailwind.config = {
+					darkMode: "class",
+					theme: {
+						extend: {
+							colors: {
+								clifford: '#da373d',
+							}
+						}
+					}
+				}
+			</script>
+		</head>
+		<body class="dark">
+			<div class="flex flex-col min-h-screen">
+				{ children... }
+			</div>
+		</body>
+	</html>
+}
+
 templ layout() {
 	<!DOCTYPE html>
 	<html class="">

@@ -1,4 +1,4 @@
-package main
+package models
 
 import (
 	"database/sql"
@@ -15,7 +15,7 @@ type User struct {
 	ApiKey    string    `json:"api_key"`
 }
 
-func databaseUserToUser(user database.User) User {
+func DatabaseUserToUser(user database.User) User {
 	return User{
 		ID:        user.ID,
 		CreatedAt: user.CreatedAt,
@@ -34,7 +34,7 @@ type Feed struct {
 	LastFetchedAt *time.Time `json:"last_fetched_at"`
 }
 
-func databaseFeedToFeed(feed database.Feed) Feed {
+func DatabaseFeedToFeed(feed database.Feed) Feed {
 	return Feed{
 		ID:            feed.ID,
 		CreatedAt:     feed.CreatedAt,
@@ -46,10 +46,10 @@ func databaseFeedToFeed(feed database.Feed) Feed {
 	}
 }
 
-func databaseFeedsToFeeds(feeds []database.Feed) []Feed {
+func DatabaseFeedsToFeeds(feeds []database.Feed) []Feed {
 	result := make([]Feed, len(feeds))
 	for i, feed := range feeds {
-		result[i] = databaseFeedToFeed(feed)
+		result[i] = DatabaseFeedToFeed(feed)
 	}
 	return result
 }
@@ -62,7 +62,7 @@ type FeedFollow struct {
 	FeedID    int32     `json:"feed_id"`
 }
 
-func databaseFeedFollowToFeedFollow(feedFollow database.FeedFollow) FeedFollow {
+func DatabaseFeedFollowToFeedFollow(feedFollow database.FeedFollow) FeedFollow {
 	return FeedFollow{
 		ID:        feedFollow.ID,
 		CreatedAt: feedFollow.CreatedAt,
@@ -72,10 +72,10 @@ func databaseFeedFollowToFeedFollow(feedFollow database.FeedFollow) FeedFollow {
 	}
 }
 
-func databaseFeedFollowsToFeedFollows(feedFollows []database.FeedFollow) []FeedFollow {
+func DatabaseFeedFollowsToFeedFollows(feedFollows []database.FeedFollow) []FeedFollow {
 	result := make([]FeedFollow, len(feedFollows))
 	for i, feedFollow := range feedFollows {
-		result[i] = databaseFeedFollowToFeedFollow(feedFollow)
+		result[i] = DatabaseFeedFollowToFeedFollow(feedFollow)
 	}
 	return result
 }
@@ -91,7 +91,7 @@ type Post struct {
 	FeedID      int32      `json:"feed_id"`
 }
 
-func databasePostToPost(post database.Post) Post {
+func DatabasePostToPost(post database.Post) Post {
 	return Post{
 		ID:          post.ID,
 		CreatedAt:   post.CreatedAt,
@@ -104,10 +104,10 @@ func databasePostToPost(post database.Post) Post {
 	}
 }
 
-func databasePostsToPosts(posts []database.Post) []Post {
+func DatabasePostsToPosts(posts []database.Post) []Post {
 	result := make([]Post, len(posts))
 	for i, post := range posts {
-		result[i] = databasePostToPost(post)
+		result[i] = DatabasePostToPost(post)
 	}
 	return result
 }

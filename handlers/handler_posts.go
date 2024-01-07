@@ -1,13 +1,14 @@
-package main
+package handlers
 
 import (
 	"net/http"
 	"strconv"
 
 	"github.com/shtayeb/rssfeed/internal/database"
+	"github.com/shtayeb/rssfeed/internal/models"
 )
 
-func (cfg *apiConfig) handlerPostsGet(w http.ResponseWriter, r *http.Request, user database.User) {
+func (cfg *ApiConfig) HandlerPostsGet(w http.ResponseWriter, r *http.Request, user database.User) {
 	limitStr := r.URL.Query().Get("limit")
 	limit := 10
 	if specifiedLimit, err := strconv.Atoi(limitStr); err == nil {
@@ -23,5 +24,5 @@ func (cfg *apiConfig) handlerPostsGet(w http.ResponseWriter, r *http.Request, us
 		return
 	}
 
-	respondWithJSON(w, http.StatusOK, databasePostsToPosts(posts))
+	respondWithJSON(w, http.StatusOK, models.DatabasePostsToPosts(posts))
 }
