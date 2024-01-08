@@ -1,6 +1,5 @@
 package views
 
-
 templ Login() {
 	@bareLayout() {
 		<div class="bg-gray-100 min-h-screen flex items-center justify-center">
@@ -73,7 +72,7 @@ templ Login() {
 
 templ Register(messages []string, errors map[string]string) {
 	@bareLayout() {
-		<div class="bg-gray-100 min-h-screen flex items-center justify-center">
+		<div class="bg-gray-100 min-h-screen flex items-center justify-center ">
 			<div class="max-w-sm rounded-lg shadow-lg bg-white p-6 space-y-6 border border-gray-200 dark:border-gray-700">
 				<div class="space-y-2 text-center">
 					<h1 class="text-3xl font-bold">Register</h1>
@@ -115,8 +114,8 @@ templ Register(messages []string, errors map[string]string) {
 							/>
 							<p class="text-red-400 text-xs py-1">
 								if errors["Name"] != "" {
-									{errors["Name"]}
-								}	
+									{ errors["Name"] }
+								}
 							</p>
 						</div>
 						<div>
@@ -136,8 +135,8 @@ templ Register(messages []string, errors map[string]string) {
 							/>
 							<p class="text-red-400 text-xs py-1">
 								if errors["Email"] != "" {
-									{errors["Email"]}
-								}	
+									{ errors["Email"] }
+								}
 							</p>
 						</div>
 						<div>
@@ -157,8 +156,8 @@ templ Register(messages []string, errors map[string]string) {
 							/>
 							<p class="text-red-400 text-xs py-1">
 								if errors["Username"] != "" {
-									{errors["Username"]}
-								}	
+									{ errors["Username"] }
+								}
 							</p>
 						</div>
 						<div>
@@ -178,8 +177,8 @@ templ Register(messages []string, errors map[string]string) {
 							/>
 							<p class="text-red-400 text-xs py-1">
 								if errors["Password"] != "" {
-									{errors["Password"]}
-								}	
+									{ errors["Password"] }
+								}
 							</p>
 						</div>
 						<div>
