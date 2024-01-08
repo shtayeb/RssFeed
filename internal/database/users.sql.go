@@ -72,3 +72,22 @@ func (q *Queries) GetUserByAPIKey(ctx context.Context, id int32) (User, error) {
 	)
 	return i, err
 }
+
+const getUserByEmailOrUsername = `-- name: GetUserByEmailOrUsername :one
+SELECT id, created_at, updated_at, username, name, email, password FROM users WHERE email=$1 or username=$1
+`
+
+func (q *Queries) GetUserByEmailOrUsername(ctx context.Context, email string) (User, error) {
+	row := q.db.QueryRowContext(ctx, getUserByEmailOrUsername, email)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Username,
+		&i.Name,
+		&i.Email,
+		&i.Password,
+	)
+	return i, err
+}

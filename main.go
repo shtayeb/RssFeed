@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"time"
 
 	"github.com/a-h/templ"
 	"github.com/go-chi/chi"
@@ -64,12 +63,15 @@ func main() {
 	router.Get("/home", templ.Handler(views.Home()).ServeHTTP)
 
 	router.Get("/login", func(w http.ResponseWriter, r *http.Request) {
-		views.Login().Render(r.Context(), w)
+		msg := []map[string]string{}
+		views.Login(msg).Render(r.Context(), w)
 	})
-	router.Get("/register", func(w http.ResponseWriter, r *http.Request) {
-		views.Register([]string{}, map[string]string{}).Render(r.Context(), w)
-	})
+	router.Post("/login", apiCfg.HandlerLogin)
 
+	router.Get("/register", func(w http.ResponseWriter, r *http.Request) {
+		msg := []map[string]string{}
+		views.Register(msg, map[string]string{}).Render(r.Context(), w)
+	})
 	router.Post("/register", apiCfg.HandlerUsersCreate)
 	// router.Get("/users", apiCfg.middlewareAuth(apiCfg.handlerUsersGet))
 
@@ -90,9 +92,9 @@ func main() {
 		Handler: router,
 	}
 
-	const collectionConcurrency = 10
-	const collectionInterval = time.Minute
-	go startScraping(dbQueries, collectionConcurrency, collectionInterval)
+	// const collectionConcurrency = 10
+	// const collectionInterval = time.Minute
+	// go startScraping(dbQueries, collectionConcurrency, collectionInterval)
 
 	log.Printf("Serving on port: %s\n", port)
 	log.Fatal(srv.ListenAndServe())

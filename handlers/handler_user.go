@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"regexp"
@@ -28,18 +27,17 @@ func HashPassword(password string) (string, error) {
 	return string(bytes), err
 }
 
-func CheckPasswordHash(password, hash string) bool {
+func checkPasswordHash(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
 }
 
+var rxEmail = regexp.MustCompile(".+@.+\\..+")
+
 func (params *UserRegisterParams) Validate() bool {
 	params.Errors = make(map[string]string)
 
-	var rxEmail = regexp.MustCompile(".+@.+\\..+")
-
-	match := rxEmail.Match([]byte(params.Email))
-	if !match {
+	if !rxEmail.Match([]byte(params.Email)) {
 		params.Errors["Email"] = "Please enter a valid email address"
 	}
 
@@ -58,6 +56,45 @@ func (params *UserRegisterParams) Validate() bool {
 	return len(params.Errors) == 0
 }
 
+func (cfg *ApiConfig) HandlerLogin(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		log.Println("Failed to parse form", err)
+	}
+
+	emailOrUsername := r.PostFormValue("email_or_username")
+	password := r.PostFormValue("password")
+
+	if emailOrUsername == "" || password == "" {
+		msg := []map[string]string{{"msg_type": "error", "msg": "Email and Password should not be empty !"}}
+		views.Login(msg).Render(r.Context(), w)
+		return
+	}
+
+	// Ge the user by email or username
+	user, err := cfg.DB.GetUserByEmailOrUsername(r.Context(), emailOrUsername)
+	if err != nil {
+		log.Println("Failed to get user from the Database", err)
+
+		msg := []map[string]string{{"msg_type": "error", "msg": "Invalid Email or Password, Try Again! 1"}}
+		views.Login(msg).Render(r.Context(), w)
+		return
+	}
+
+	// Get the password against hashed pass
+	if !checkPasswordHash(password, user.Password) {
+		// Email Invalid
+		msg := []map[string]string{{"msg_type": "error", "msg": "Invalid Email or Password, Try Again! 2"}}
+		views.Login(msg).Render(r.Context(), w)
+		return
+	}
+
+	// msg := []map[string]string{{"msg_type": "error", "msg": "Invalid Email or Password, Try Again!"}}
+	http.Redirect(w, r, "/home", http.StatusSeeOther)
+	// msg := []map[string]string{{"msg_type": "success", "msg": "Success !"}}
+	// views.Login(msg).Render(r.Context(), w)
+}
+
 func (cfg *ApiConfig) HandlerUsersCreate(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
@@ -74,11 +111,13 @@ func (cfg *ApiConfig) HandlerUsersCreate(w http.ResponseWriter, r *http.Request)
 
 	// https://github.com/go-playground/validator
 	if !params.Validate() {
-		// views.Register([]string{}, params.Errors).Render(r.Context(), w)
+		msg := []map[string]string{}
+		views.Register(msg, params.Errors).Render(r.Context(), w)
+		return
 		// http.Redirect(w, r, "/register", http.StatusSeeOther)
 		// https://blog.jetbrains.com/go/2022/11/08/build-a-blog-with-go-templates/#creating-the-routes
-		http.Error(w, fmt.Sprintf("Validation error"), http.StatusBadRequest)
-		return
+		// http.Error(w, fmt.Sprintf("Validation error"), http.StatusBadRequest)
+		// return
 
 	}
 
@@ -101,11 +140,14 @@ func (cfg *ApiConfig) HandlerUsersCreate(w http.ResponseWriter, r *http.Request)
 		log.Println("Here test", err)
 		// respondWithError(w, http.StatusInternalServerError, "Couldn't create user")
 		// w.WriteHeader(http.StatusInternalServerError)
-		views.Register([]string{"Couldn't create user", err.Error()}, params.Errors).Render(r.Context(), w)
+		msg := []map[string]string{{"msg_type": "error", "msg": "Could not create user"}}
+		views.Register(msg, params.Errors).Render(r.Context(), w)
+		return
 	}
 
 	// w.WriteHeader(http.StatusCreated)
-	views.Register([]string{"User created successfully !"}, params.Errors).Render(r.Context(), w)
+	msg := []map[string]string{{"msg_type": "success", "msg": "User created successfully !"}}
+	views.Register(msg, params.Errors).Render(r.Context(), w)
 }
 
 func (cfg *ApiConfig) HandlerUsersGet(w http.ResponseWriter, r *http.Request, user database.User) {
