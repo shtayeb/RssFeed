@@ -1,7 +1,9 @@
 package views
 
+import "github.com/shtayeb/rssfeed/internal/database"
+
 templ navbar() {
-	<header class="h-14 flex items-center container max-w-screen-xl mx-auto">
+	<header class="h-14 flex items-center container max-w-screen-xl mx-auto border-b px-4 md:px-6">
 		<a href="/">
 			<h1 class="text-2xl font-bold">TECH FEED</h1>
 		</a>
@@ -9,13 +11,13 @@ templ navbar() {
 			<a class="text-sm font-medium hover:underline underline-offset-4" href="/home">
 				Home
 			</a>
-			<a class="text-sm font-medium hover:underline underline-offset-4" href="#">
-				Categories
+			<a class="text-sm font-medium hover:underline underline-offset-4" href="/feeds/create">
+				Feed
 			</a>
 			<a class="text-sm font-medium hover:underline underline-offset-4" href="/register">
 				Register
 			</a>
-			<a class="text-sm font-medium hover:underline underline-offset-4" href="login">
+			<a class="text-sm font-medium hover:underline underline-offset-4" href="/login">
 				Login
 			</a>
 		</nav>
@@ -23,7 +25,7 @@ templ navbar() {
 }
 
 templ footer() {
-	<footer class="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t container max-w-screen-xl mx-auto">
+	<footer class="flex flex-col gap-2 sm:flex-row py-6 px-4 md:px-6 w-full shrink-0 items-center border-t container max-w-screen-xl mx-auto">
 		<p class="text-xs text-gray-500 ">
 			©  RSS Feed Aggregator. All rights reserved.
 		</p>
@@ -98,7 +100,10 @@ templ layout() {
 	</html>
 }
 
-templ Landing() {
+// Get latest feed
+// Later the most popular feeds
+// Landing(feeds []Feed)
+templ Landing(feeds []database.Feed) {
 	@layout() {
 		<section class="py-6 sm:py-12 md:py-24 lg:py-32 xl:py-48 max-w-screen-xl mx-auto">
 			<div class="px-4 md:px-6">
@@ -117,48 +122,16 @@ templ Landing() {
 		<section class="py-12 md:py-24 lg:py-32 bg-gray-100">
 			<div class="px-4 md:px-6 max-w-screen-xl mx-auto">
 				<div class="grid gap-6 lg:grid-cols-3 lg:gap-12">
-					<div class="rounded-lg border  text-card-foreground bg-gray-50 shadow-sm" data-v0-t="card">
-						<div class="p-6 flex flex-col items-center space-y-4">
-							<img src="https://placehold.co/600x400" width="180" height="90" alt="Logo" class="aspect-[2/1] overflow-hidden rounded-lg object-contain object-center"/>
-							<h3 class="text-xl font-bold">Source Name</h3>
-							<p class="text-gray-500 ">Short description of the source.</p>
+					// for
+					for _,feed := range feeds {
+						<div class="rounded-lg border  text-card-foreground bg-gray-50 shadow-sm" data-v0-t="card">
+							<div class="p-6 flex flex-col items-center space-y-4">
+								<img src="https://placehold.co/600x400" width="180" height="90" alt="Logo" class="aspect-[2/1] overflow-hidden rounded-lg object-contain object-center"/>
+								<h3 class="text-xl font-bold">{ feed.Name }</h3>
+								<p class="text-gray-500 ">Short description of the source.</p>
+							</div>
 						</div>
-					</div>
-					<div class="rounded-lg border  text-card-foreground bg-gray-50 shadow-sm" data-v0-t="card">
-						<div class="p-6 flex flex-col items-center space-y-4">
-							<img src="https://placehold.co/600x400" width="180" height="90" alt="Logo" class="aspect-[2/1] overflow-hidden rounded-lg object-contain object-center"/>
-							<h3 class="text-xl font-bold">Source Name</h3>
-							<p class="text-gray-500 ">Short description of the source.</p>
-						</div>
-					</div>
-					<div class="rounded-lg border  text-card-foreground bg-gray-50 shadow-sm" data-v0-t="card">
-						<div class="p-6 flex flex-col items-center space-y-4">
-							<img src="https://placehold.co/600x400" width="180" height="90" alt="Logo" class="aspect-[2/1] overflow-hidden rounded-lg object-contain object-center"/>
-							<h3 class="text-xl font-bold">Source Name</h3>
-							<p class="text-gray-500 ">Short description of the source.</p>
-						</div>
-					</div>
-					<div class="rounded-lg border  text-card-foreground bg-gray-50 shadow-sm" data-v0-t="card">
-						<div class="p-6 flex flex-col items-center space-y-4">
-							<img src="https://placehold.co/600x400" width="180" height="90" alt="Logo" class="aspect-[2/1] overflow-hidden rounded-lg object-contain object-center"/>
-							<h3 class="text-xl font-bold">Source Name</h3>
-							<p class="text-gray-500 ">Short description of the source.</p>
-						</div>
-					</div>
-					<div class="rounded-lg border text-card-foreground bg-gray-50 shadow-sm" data-v0-t="card">
-						<div class="p-6 flex flex-col items-center space-y-4">
-							<img src="https://placehold.co/600x400" width="180" height="90" alt="Logo" class="aspect-[2/1] overflow-hidden rounded-lg object-contain object-center"/>
-							<h3 class="text-xl font-bold">Source Name</h3>
-							<p class="text-gray-500 ">Short description of the source.</p>
-						</div>
-					</div>
-					<div class="rounded-lg border  text-card-foreground bg-gray-50 shadow-sm" data-v0-t="card">
-						<div class="p-6 flex flex-col items-center space-y-4">
-							<img src="https://placehold.co/600x400" width="180" height="90" alt="Logo" class="aspect-[2/1] overflow-hidden rounded-lg object-contain object-center"/>
-							<h3 class="text-xl font-bold">Source Name</h3>
-							<p class="text-gray-500 ">Short description of the source.</p>
-						</div>
-					</div>
+					}
 				</div>
 			</div>
 		</section>
@@ -174,7 +147,10 @@ templ Landing() {
 				</div>
 				<div class="mx-auto w-full max-w-sm space-y-2">
 					<form class="flex space-x-2">
-						<input class="flex h-10 w-full rounded-md border border-input  px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 max-w-lg flex-1" placeholder="Enter your email" type="email"/><button class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50  text-primary-foreground  h-10 px-4 py-2" type="submit">Subscribe</button>
+						<input class="flex h-10 w-full rounded-md border-2 border-input  px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 max-w-lg flex-1" placeholder="Enter your email" type="email"/>
+						<button class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50  text-primary-foreground  h-10 px-4 py-2 bg-black text-white" type="submit">
+							Subscribe
+						</button>
 					</form>
 				</div>
 			</div>

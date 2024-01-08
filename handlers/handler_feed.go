@@ -7,9 +7,15 @@ import (
 
 	"github.com/shtayeb/rssfeed/internal/database"
 	"github.com/shtayeb/rssfeed/internal/models"
+	"github.com/shtayeb/rssfeed/views"
 )
 
-func (cfg *ApiConfig) HandlerFeedCreate(w http.ResponseWriter, r *http.Request, user database.User) {
+func (cfg *ApiConfig) HandlerFeedCreate(w http.ResponseWriter, r *http.Request) {
+	// feeds/create
+	views.FeedCreate().Render(r.Context(), w)
+}
+
+func (cfg *ApiConfig) HandlerFeedStore(w http.ResponseWriter, r *http.Request, user database.User) {
 	type parameters struct {
 		Name string `json:"name"`
 		URL  string `json:"url"`

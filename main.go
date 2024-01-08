@@ -54,11 +54,7 @@ func main() {
 
 	router.Use(middleware.Logger)
 
-	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		// templ.Handler(views.NotFoundComponent()).ServeHTTP(w, r)
-		views.Landing().Render(r.Context(), w)
-
-	})
+	router.Get("/", apiCfg.HandlerLandingPage)
 
 	router.Get("/home", templ.Handler(views.Home()).ServeHTTP)
 
@@ -75,8 +71,9 @@ func main() {
 	router.Post("/register", apiCfg.HandlerUsersCreate)
 	// router.Get("/users", apiCfg.middlewareAuth(apiCfg.handlerUsersGet))
 
-	// router.Post("/feeds", apiCfg.middlewareAuth(apiCfg.handlerFeedCreate))
 	router.Get("/feeds", apiCfg.HandlerGetFeeds)
+	// router.Post("/feeds", apiCfg.middlewareAuth(apiCfg.handlerFeedStore))
+	router.Get("/feeds/create", apiCfg.HandlerFeedCreate)
 
 	// router.Get("/feed_follows", apiCfg.middlewareAuth(apiCfg.handlerFeedFollowsGet))
 	// router.Post("/feed_follows", apiCfg.middlewareAuth(apiCfg.handlerFeedFollowCreate))
