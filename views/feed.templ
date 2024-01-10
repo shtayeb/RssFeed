@@ -1,6 +1,15 @@
 
 package views
 
+templ feedLi(){
+  <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+									<td class="p-4 align-middle ">John Doe</td>
+									<td class="p-4 align-middle ">johndoe@example.com</td>
+									<td class="p-4 align-middle ">Admin</td>
+								</tr>
+
+}
+
 templ FeedCreate() {
 	@layout() {
 		<div class="grid grid-cols-1 lg:grid-cols-1 gap-6 px-4 py-6 max-w-screen-xl mx-auto px-4 md:px-6">

@@ -41,8 +41,17 @@ func main() {
 		DB: dbQueries,
 	}
 
-	router := chi.NewRouter()
+	authRouter := chi.NewRouter()
 
+	authRouter.Group(func(ar chi.Router) {
+		ar.Use(apiCfg.MyMiddleware)
+		ar.Get("/auth", apiCfg.HandlerTestPage)
+		ar.Get("/home", templ.Handler(views.Home()).ServeHTTP)
+
+		ar.Get("/feeds/create", apiCfg.HandlerFeedCreate)
+	})
+
+	router := chi.NewRouter()
 	router.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"https://*", "http://*"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
@@ -55,8 +64,6 @@ func main() {
 	router.Use(middleware.Logger)
 
 	router.Get("/", apiCfg.HandlerLandingPage)
-
-	router.Get("/home", templ.Handler(views.Home()).ServeHTTP)
 
 	router.Get("/login", func(w http.ResponseWriter, r *http.Request) {
 		msg := []map[string]string{}
@@ -73,7 +80,6 @@ func main() {
 
 	router.Get("/feeds", apiCfg.HandlerGetFeeds)
 	// router.Post("/feeds", apiCfg.middlewareAuth(apiCfg.handlerFeedStore))
-	router.Get("/feeds/create", apiCfg.HandlerFeedCreate)
 
 	// router.Get("/feed_follows", apiCfg.middlewareAuth(apiCfg.handlerFeedFollowsGet))
 	// router.Post("/feed_follows", apiCfg.middlewareAuth(apiCfg.handlerFeedFollowCreate))
@@ -83,6 +89,8 @@ func main() {
 
 	router.Get("/healthz", handlers.HandlerReadiness)
 	router.Get("/err", handlers.HandlerErr)
+
+	router.Mount("/", authRouter)
 
 	srv := &http.Server{
 		Addr:    ":" + port,

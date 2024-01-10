@@ -1,12 +1,14 @@
 package handlers
 
 import (
+	"database/sql"
 	"log"
 	"net/http"
 	"regexp"
 	"strings"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/shtayeb/rssfeed/internal/database"
 	"github.com/shtayeb/rssfeed/internal/models"
 	"github.com/shtayeb/rssfeed/views"
@@ -66,7 +68,9 @@ func (cfg *ApiConfig) HandlerLogin(w http.ResponseWriter, r *http.Request) {
 	password := r.PostFormValue("password")
 
 	if emailOrUsername == "" || password == "" {
-		msg := []map[string]string{{"msg_type": "error", "msg": "Email and Password should not be empty !"}}
+		msg := []map[string]string{
+			{"msg_type": "error", "msg": "Email and Password should not be empty !"},
+		}
 		views.Login(msg).Render(r.Context(), w)
 		return
 	}
@@ -76,7 +80,9 @@ func (cfg *ApiConfig) HandlerLogin(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("Failed to get user from the Database", err)
 
-		msg := []map[string]string{{"msg_type": "error", "msg": "Invalid Email or Password, Try Again! 1"}}
+		msg := []map[string]string{
+			{"msg_type": "error", "msg": "Invalid Email or Password, Try Again! 1"},
+		}
 		views.Login(msg).Render(r.Context(), w)
 		return
 	}
@@ -84,11 +90,43 @@ func (cfg *ApiConfig) HandlerLogin(w http.ResponseWriter, r *http.Request) {
 	// Get the password against hashed pass
 	if !checkPasswordHash(password, user.Password) {
 		// Email Invalid
-		msg := []map[string]string{{"msg_type": "error", "msg": "Invalid Email or Password, Try Again! 2"}}
+		msg := []map[string]string{
+			{"msg_type": "error", "msg": "Invalid Email or Password, Try Again! 2"},
+		}
 		views.Login(msg).Render(r.Context(), w)
 		return
 	}
 
+	// Create a session in the DB
+	//   pe CreateSessionParams struct {
+	// 	ID        uuid.UUID
+	// 	UserID    int32
+	// 	IpAddress sql.NullString
+	// 	UserAgent sql.NullString
+	// 	Payload   sql.NullString
+	// 	ExpiresAt sql.NullTime
+	// }
+
+	session, err := cfg.DB.CreateSession(r.Context(), database.CreateSessionParams{
+		ID:        uuid.New(),
+		UserID:    user.ID,
+		ExpiresAt: sql.NullTime{},
+	})
+	if err != nil {
+		log.Println("Failed to create seesion in the the Database", err)
+		msg := []map[string]string{
+			{"msg_type": "error", "msg": "Something went wrong. Please try again!"},
+		}
+		views.Login(msg).Render(r.Context(), w)
+
+		return
+	}
+	// Set the seesion ID in the cookie
+	http.SetCookie(w, &http.Cookie{
+		Name:    "session_token",
+		Value:   (session.ID).String(),
+		Expires: time.Now().Add(120 * time.Second),
+	})
 	// msg := []map[string]string{{"msg_type": "error", "msg": "Invalid Email or Password, Try Again!"}}
 	http.Redirect(w, r, "/home", http.StatusSeeOther)
 	// msg := []map[string]string{{"msg_type": "success", "msg": "Success !"}}
