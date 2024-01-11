@@ -1,16 +1,15 @@
 package handlers
 
 import (
-	"database/sql"
 	"log"
 	"net/http"
 	"regexp"
 	"strings"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/shtayeb/rssfeed/internal/database"
 	"github.com/shtayeb/rssfeed/internal/models"
+	"github.com/shtayeb/rssfeed/internal/session"
 	"github.com/shtayeb/rssfeed/views"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -59,6 +58,7 @@ func (params *UserRegisterParams) Validate() bool {
 }
 
 func (cfg *ApiConfig) HandlerLogin(w http.ResponseWriter, r *http.Request) {
+	// If user is loggedin redirect them back with a mesasge
 	err := r.ParseForm()
 	if err != nil {
 		log.Println("Failed to parse form", err)
@@ -97,36 +97,36 @@ func (cfg *ApiConfig) HandlerLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Create a session in the DB
-	//   pe CreateSessionParams struct {
-	// 	ID        uuid.UUID
-	// 	UserID    int32
-	// 	IpAddress sql.NullString
-	// 	UserAgent sql.NullString
-	// 	Payload   sql.NullString
-	// 	ExpiresAt sql.NullTime
+	// ses, err := cfg.DB.CreateSession(r.Context(), database.CreateSessionParams{
+	// 	ID:        uuid.New(),
+	// 	UserID:    user.ID,
+	// 	ExpiresAt: sql.NullTime{},
+	// })
+	// if err != nil {
+	// 	log.Println("Failed to create seesion in the the Database", err)
+	// 	msg := []map[string]string{
+	// 		{"msg_type": "error", "msg": "Something went wrong. Please try again!"},
+	// 	}
+	// 	views.Login(msg).Render(r.Context(), w)
+	//
+	// 	return
 	// }
-
-	session, err := cfg.DB.CreateSession(r.Context(), database.CreateSessionParams{
-		ID:        uuid.New(),
-		UserID:    user.ID,
-		ExpiresAt: sql.NullTime{},
-	})
-	if err != nil {
-		log.Println("Failed to create seesion in the the Database", err)
-		msg := []map[string]string{
-			{"msg_type": "error", "msg": "Something went wrong. Please try again!"},
-		}
-		views.Login(msg).Render(r.Context(), w)
-
-		return
-	}
 	// Set the seesion ID in the cookie
-	http.SetCookie(w, &http.Cookie{
-		Name:    "session_token",
-		Value:   (session.ID).String(),
-		Expires: time.Now().Add(120 * time.Second),
-	})
+	log.Printf("Login: loggedin user: %v ", user.ID)
+	session.SessionManager.Put(r.Context(), "user_id", user.ID)
+
+	// token, time, err := session.SessionManager.Commit(r.Context())
+	// log.Printf("Login: Commit session: %v in the time: %v", token, time)
+
+	user_id := session.SessionManager.GetInt(r.Context(), "user_id")
+
+	log.Printf("Login: UserID in login: %v", user_id)
+	//
+	// http.SetCookie(w, &http.Cookie{
+	// 	Name:    "session_token",
+	// 	Value:   (session.ID).String(),
+	// 	Expires: time.Now().Add(120 * time.Second),
+	// })
 	// msg := []map[string]string{{"msg_type": "error", "msg": "Invalid Email or Password, Try Again!"}}
 	http.Redirect(w, r, "/home", http.StatusSeeOther)
 	// msg := []map[string]string{{"msg_type": "success", "msg": "Success !"}}
@@ -190,4 +190,18 @@ func (cfg *ApiConfig) HandlerUsersCreate(w http.ResponseWriter, r *http.Request)
 
 func (cfg *ApiConfig) HandlerUsersGet(w http.ResponseWriter, r *http.Request, user database.User) {
 	respondWithJSON(w, http.StatusOK, models.DatabaseUserToUser(user))
+}
+
+func (cfg *ApiConfig) HandlerLogout(w http.ResponseWriter, r *http.Request) {
+	// Delete the session from the DB
+	err := session.SessionManager.Destroy(r.Context())
+	if err != nil {
+		log.Println("Failed to Destroy the session")
+		return
+	}
+
+	// context.WithValue(r.Context(), "user", nil)
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+	return
 }

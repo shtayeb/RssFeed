@@ -8,6 +8,8 @@ require github.com/go-chi/chi v1.5.5
 
 require (
 	github.com/a-h/templ v0.2.513 // indirect
+	github.com/alexedwards/scs/postgresstore v0.0.0-20231113091146-cef4b05350c8 // indirect
+	github.com/alexedwards/scs/v2 v2.7.0 // indirect
 	github.com/google/uuid v1.5.0 // indirect
 )
 

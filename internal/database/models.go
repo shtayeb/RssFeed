@@ -7,8 +7,6 @@ package database
 import (
 	"database/sql"
 	"time"
-
-	"github.com/google/uuid"
 )
 
 type Feed struct {
@@ -41,12 +39,9 @@ type Post struct {
 }
 
 type Session struct {
-	ID        uuid.UUID
-	UserID    int32
-	IpAddress sql.NullString
-	UserAgent sql.NullString
-	Payload   sql.NullString
-	ExpiresAt sql.NullTime
+	Token  string
+	Data   []byte
+	Expiry time.Time
 }
 
 type User struct {
