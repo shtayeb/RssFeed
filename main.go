@@ -23,8 +23,6 @@ import (
 	_ "github.com/lib/pq"
 )
 
-// var SessionManager *scs.SessionManager
-
 func main() {
 	godotenv.Load(".env")
 
@@ -48,19 +46,7 @@ func main() {
 		DB: dbQueries,
 	}
 	//
-	// SessionManager = scs.New()
-	// SessionManager.Lifetime = 24 * time.Second
-	// SessionManager.Store = postgresstore.New(db)
 	session.InitSessionManager(db)
-	authRouter := chi.NewRouter()
-
-	authRouter.Group(func(ar chi.Router) {
-		ar.Use(session.SessionManager.LoadAndSave)
-		ar.Use(apiCfg.MyMiddleware)
-		ar.Get("/home", templ.Handler(views.Home()).ServeHTTP)
-		ar.Post("/logout", apiCfg.HandlerLogout)
-		ar.Get("/feeds/create", apiCfg.HandlerFeedCreate)
-	})
 
 	router := chi.NewRouter()
 	router.Use(cors.Handler(cors.Options{
@@ -71,47 +57,51 @@ func main() {
 		AllowCredentials: false,
 		MaxAge:           300,
 	}))
-
 	router.Use(middleware.Logger)
+	// router.Use(middleware.Recoverer)
 	router.Use(session.SessionManager.LoadAndSave)
+	router.Use(apiCfg.SessionMiddleware)
+	// Public Routes
+	router.Group(func(r chi.Router) {
+		r.Get("/", apiCfg.HandlerLandingPage)
 
-	router.Get("/", apiCfg.HandlerLandingPage)
+		r.Get("/login", apiCfg.HandlerLoginView)
+		r.Post("/login", apiCfg.HandlerLogin)
 
-	router.Get("/login", func(w http.ResponseWriter, r *http.Request) {
-		// If user is loggedin redirect them back with a mesasge
-		msg := []map[string]string{}
-		views.Login(msg).Render(r.Context(), w)
+		r.Get("/register", apiCfg.HandlerRegisterView)
+		r.Post("/register", apiCfg.HandlerUsersCreate)
+
+		r.Get("/feeds", apiCfg.HandlerGetFeeds)
+
+		r.Get("/healthz", handlers.HandlerReadiness)
+		r.Get("/err", handlers.HandlerErr)
 	})
-	router.Post("/login", apiCfg.HandlerLogin)
 
-	router.Get("/register", func(w http.ResponseWriter, r *http.Request) {
-		// If user is loggedin redirect them back with a mesasge
-		msg := []map[string]string{}
-		log.Printf("SessionManager-Main: %v", session.SessionManager)
-		views.Register(msg, map[string]string{}).Render(r.Context(), w)
+	// Private Routes
+	// Require Authentication
+
+	router.Group(func(ar chi.Router) {
+		ar.Use(apiCfg.AuthMiddleware)
+		ar.Get("/home", templ.Handler(views.Home()).ServeHTTP)
+		ar.Post("/logout", apiCfg.HandlerLogout)
+
+		ar.Get("/feeds", apiCfg.HandlerFeedCreate)
+		ar.Post("/feeds", apiCfg.HandlerFeedStore)
+
+		// router.Get("/feed_follows", apiCfg.middlewareAuth(apiCfg.handlerFeedFollowsGet))
+		// router.Post("/feed_follows", apiCfg.middlewareAuth(apiCfg.handlerFeedFollowCreate))
+		// router.Delete("/feed_follows/{feedFollowID}", apiCfg.middlewareAuth(apiCfg.handlerFeedFollowDelete))
+
+		// router.Get("/posts", apiCfg.middlewareAuth(apiCfg.handlerPostsGet))
+		// router.Get("/users", apiCfg.middlewareAuth(apiCfg.handlerUsersGet))
 	})
-	router.Post("/register", apiCfg.HandlerUsersCreate)
-	// router.Get("/users", apiCfg.middlewareAuth(apiCfg.handlerUsersGet))
-
-	router.Get("/feeds", apiCfg.HandlerGetFeeds)
-	// router.Post("/feeds", apiCfg.middlewareAuth(apiCfg.handlerFeedStore))
-
-	// router.Get("/feed_follows", apiCfg.middlewareAuth(apiCfg.handlerFeedFollowsGet))
-	// router.Post("/feed_follows", apiCfg.middlewareAuth(apiCfg.handlerFeedFollowCreate))
-	// router.Delete("/feed_follows/{feedFollowID}", apiCfg.middlewareAuth(apiCfg.handlerFeedFollowDelete))
-
-	// router.Get("/posts", apiCfg.middlewareAuth(apiCfg.handlerPostsGet))
-
-	router.Get("/healthz", handlers.HandlerReadiness)
-	router.Get("/err", handlers.HandlerErr)
-
-	router.Mount("/", authRouter)
 
 	srv := &http.Server{
 		Addr:    ":" + port,
 		Handler: router,
 	}
 
+	// Fecht posts routne
 	// const collectionConcurrency = 10
 	// const collectionInterval = time.Minute
 	// go startScraping(dbQueries, collectionConcurrency, collectionInterval)

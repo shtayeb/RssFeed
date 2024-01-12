@@ -1,6 +1,6 @@
 package views
 
-templ Login(messages []map[string]string) {
+templ Login() {
 	@bareLayout() {
 		<div class="bg-gray-100 min-h-screen flex items-center justify-center">
 			<div class="max-w-sm rounded-lg shadow bg-white p-6 space-y-6 border">
@@ -18,7 +18,10 @@ templ Login(messages []map[string]string) {
 						.
 					</p>
 				</div>
-				@renderMessages(messages)
+
+			if ctx.Value("msgs") != nil {
+				@renderMessages(ctx.Value("msgs").([]map[string]string))
+      }
 				<form class="space-y-4" method="POST" action="/login">
 					<div class="space-y-2">
 						<div class="space-y-2">
@@ -104,7 +107,7 @@ templ renderMessages(messages []map[string]string) {
 // 	msg string `json:"msg"`
 // }
 // []map[string]string{{"msg_type": "error", "msg": "Could not create user"}}
-templ Register(messages []map[string]string, errors map[string]string) {
+templ Register(errors map[string]string) {
 	@bareLayout() {
 		<div class="bg-gray-100 min-h-screen flex items-center justify-center ">
 			<div class="max-w-sm rounded-lg shadow bg-white p-6 space-y-6">
@@ -122,7 +125,10 @@ templ Register(messages []map[string]string, errors map[string]string) {
 						.
 					</p>
 				</div>
-				@renderMessages(messages)
+
+			if ctx.Value("msgs") != nil {
+				@renderMessages(ctx.Value("msgs").([]map[string]string))
+      }
 				<form class="space-y-4" method="POST" action="/register">
 					<div class="space-y-2">
 						<div>

@@ -11,15 +11,23 @@ templ navbar() {
 			<a class="text-sm font-medium hover:underline underline-offset-4" href="/home">
 				Home
 			</a>
-			<a class="text-sm font-medium hover:underline underline-offset-4" href="/feeds/create">
+			<a class="text-sm font-medium hover:underline underline-offset-4" href="/feeds">
 				Feed
 			</a>
-			<a class="text-sm font-medium hover:underline underline-offset-4" href="/register">
-				Register
-			</a>
-			<a class="text-sm font-medium hover:underline underline-offset-4" href="/login">
-				Login
-			</a>
+			if ctx.Value("user") != nil {
+				<form method="post" action="/logout">
+					<button class="text-sm font-medium hover:underline underline-offset-4" type="submit">
+						Logout	
+					</button>
+				</form>
+			} else {
+				<a class="text-sm font-medium hover:underline underline-offset-4" href="/register">
+					Register
+				</a>
+				<a class="text-sm font-medium hover:underline underline-offset-4" href="/login">
+					Login
+				</a>
+			}
 		</nav>
 	</header>
 }
@@ -91,6 +99,10 @@ templ layout() {
 		<body class="dark">
 			<div class="flex flex-col min-h-screen">
 				@navbar()
+         
+			if ctx.Value("msgs") != nil {
+				@renderMessages(ctx.Value("msgs").([]map[string]string))
+      }
 				<main class="flex-1 ">
 					{ children... }
 				</main>

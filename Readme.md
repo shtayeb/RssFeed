@@ -7,7 +7,7 @@
 - [x] Inlcude the session data in the context for the views
 - [x] Link Middleware and session to get auth user
 
-- Get the user details from context in the templ files
+-[x] Get the user details from context in the templ files
 - Check django for any other userful data to be included in the context
 - Create a logout handler
     - Delete the session when user logs out

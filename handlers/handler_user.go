@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"regexp"
@@ -21,6 +22,21 @@ type UserRegisterParams struct {
 	Password             string
 	PasswordConfirmation string
 	Errors               map[string]string
+}
+
+func (cfg *ApiConfig) HandlerRegisterView(w http.ResponseWriter, r *http.Request) {
+	// MOve mesages to context
+	// msgs := []map[string]string{}
+	// ctx := context.WithValue(r.Context(), "msgs", msgs)
+	views.Register(map[string]string{}).Render(r.Context(), w)
+}
+
+func (cfg *ApiConfig) HandlerLoginView(w http.ResponseWriter, r *http.Request) {
+	// If user is loggedin redirect them back with a mesasge
+	// move messages to context
+	// msgs := []map[string]string{}
+	// ctx := context.WithValue(r.Context(), "msgs", msgs)
+	views.Login().Render(r.Context(), w)
 }
 
 func HashPassword(password string) (string, error) {
@@ -68,10 +84,11 @@ func (cfg *ApiConfig) HandlerLogin(w http.ResponseWriter, r *http.Request) {
 	password := r.PostFormValue("password")
 
 	if emailOrUsername == "" || password == "" {
-		msg := []map[string]string{
+		msgs := []map[string]string{
 			{"msg_type": "error", "msg": "Email and Password should not be empty !"},
 		}
-		views.Login(msg).Render(r.Context(), w)
+		ctx := context.WithValue(r.Context(), "msgs", msgs)
+		views.Login().Render(ctx, w)
 		return
 	}
 
@@ -80,20 +97,23 @@ func (cfg *ApiConfig) HandlerLogin(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("Failed to get user from the Database", err)
 
-		msg := []map[string]string{
+		msgs := []map[string]string{
 			{"msg_type": "error", "msg": "Invalid Email or Password, Try Again! 1"},
 		}
-		views.Login(msg).Render(r.Context(), w)
+		ctx := context.WithValue(r.Context(), "msgs", msgs)
+
+		views.Login().Render(ctx, w)
 		return
 	}
 
 	// Get the password against hashed pass
 	if !checkPasswordHash(password, user.Password) {
 		// Email Invalid
-		msg := []map[string]string{
+		msgs := []map[string]string{
 			{"msg_type": "error", "msg": "Invalid Email or Password, Try Again! 2"},
 		}
-		views.Login(msg).Render(r.Context(), w)
+		ctx := context.WithValue(r.Context(), "msgs", msgs)
+		views.Login().Render(ctx, w)
 		return
 	}
 
@@ -149,8 +169,8 @@ func (cfg *ApiConfig) HandlerUsersCreate(w http.ResponseWriter, r *http.Request)
 
 	// https://github.com/go-playground/validator
 	if !params.Validate() {
-		msg := []map[string]string{}
-		views.Register(msg, params.Errors).Render(r.Context(), w)
+		// msg := []map[string]string{}
+		views.Register(params.Errors).Render(r.Context(), w)
 		return
 		// http.Redirect(w, r, "/register", http.StatusSeeOther)
 		// https://blog.jetbrains.com/go/2022/11/08/build-a-blog-with-go-templates/#creating-the-routes
@@ -178,14 +198,17 @@ func (cfg *ApiConfig) HandlerUsersCreate(w http.ResponseWriter, r *http.Request)
 		log.Println("Here test", err)
 		// respondWithError(w, http.StatusInternalServerError, "Couldn't create user")
 		// w.WriteHeader(http.StatusInternalServerError)
-		msg := []map[string]string{{"msg_type": "error", "msg": "Could not create user"}}
-		views.Register(msg, params.Errors).Render(r.Context(), w)
+		msgs := []map[string]string{{"msg_type": "error", "msg": "Could not create user"}}
+		ctx := context.WithValue(r.Context(), "msgs", msgs)
+
+		views.Register(params.Errors).Render(ctx, w)
 		return
 	}
 
 	// w.WriteHeader(http.StatusCreated)
-	msg := []map[string]string{{"msg_type": "success", "msg": "User created successfully !"}}
-	views.Register(msg, params.Errors).Render(r.Context(), w)
+	msgs := []map[string]string{{"msg_type": "success", "msg": "User created successfully !"}}
+	ctx := context.WithValue(r.Context(), "msgs", msgs)
+	views.Register(params.Errors).Render(ctx, w)
 }
 
 func (cfg *ApiConfig) HandlerUsersGet(w http.ResponseWriter, r *http.Request, user database.User) {
@@ -194,6 +217,7 @@ func (cfg *ApiConfig) HandlerUsersGet(w http.ResponseWriter, r *http.Request, us
 
 func (cfg *ApiConfig) HandlerLogout(w http.ResponseWriter, r *http.Request) {
 	// Delete the session from the DB
+	log.Println("LogoutHanlder")
 	err := session.SessionManager.Destroy(r.Context())
 	if err != nil {
 		log.Println("Failed to Destroy the session")

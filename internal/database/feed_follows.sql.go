@@ -12,13 +12,12 @@ import (
 
 const createFeedFollow = `-- name: CreateFeedFollow :one
 
-INSERT INTO feed_follows (id, created_at, updated_at, user_id, feed_id)
-VALUES ($1, $2, $3, $4, $5)
+INSERT INTO feed_follows (created_at, updated_at, user_id, feed_id)
+VALUES ($1, $2, $3, $4)
 RETURNING id, created_at, updated_at, user_id, feed_id
 `
 
 type CreateFeedFollowParams struct {
-	ID        int32
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	UserID    int32
@@ -28,7 +27,6 @@ type CreateFeedFollowParams struct {
 //
 func (q *Queries) CreateFeedFollow(ctx context.Context, arg CreateFeedFollowParams) (FeedFollow, error) {
 	row := q.db.QueryRowContext(ctx, createFeedFollow,
-		arg.ID,
 		arg.CreatedAt,
 		arg.UpdatedAt,
 		arg.UserID,

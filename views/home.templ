@@ -1,11 +1,12 @@
 package views
 
+import "github.com/shtayeb/rssfeed/internal/database"
+
 templ Home() {
 	@layout() {
 		<section class="max-w-screen-xl mx-auto px-4 md:px-6">
 			<div class="py-8">
-				<h2 class="text-3xl font-bold mb-6"> Latest Posts</h2>
-
+				<h2 class="text-3xl font-bold mb-6">{ ctx.Value("user").(database.User).Email }:  Latest Posts</h2>
 				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 					<div class="border border-gray-200 shadow-sm rounded-lg p-4">
 						<h2 class="text-xl font-bold mb-2">Post Title 1</h2>
