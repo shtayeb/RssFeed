@@ -8,9 +8,9 @@
 - [x] Link Middleware and session to get auth user
 
 -[x] Get the user details from context in the templ files
-- Check django for any other userful data to be included in the context
 - Create a logout handler
-    - Delete the session when user logs out
-    - If user is loggedin redirect them back with a mesasge
+    - [x] Delete the session when user logs out
+    -If user is loggedin redirect them to referrer
 
 - CSRF token protection for the forms
+- Check django for any other userful data to be included in the context

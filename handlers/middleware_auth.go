@@ -17,25 +17,17 @@ type Session struct {
 	UserID    int
 }
 
-// func refreshToken(cfg ApiConfig, w http.ResponseWriter, s Session) (err error) {
-// 	// newSessionToken := uuid.NewString()
-//
-// 	// Generate new id for the session and update the DB record
-// 	// Delete the older session token
-//
-// 	// Set the new token as the users `session_token` cookie
-// 	http.SetCookie(w, &http.Cookie{
-// 		Name:    "session_token",
-// 		Value:   (s.ID).String(),
-// 		Expires: time.Now().Add(120 * time.Second),
-// 	})
-// 	return nil
-// }
-
 func (cfg *ApiConfig) SessionMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
+		log.Println("=========This is for the session redirec: =============")
+		log.Printf("The full url, Host and RequestURI: %v   -----   %v", r.Host, r.RequestURI)
+		log.Printf("This is a try to get origin url: %v", r.Referer())
+		log.Printf("Request reponse - redirect client : %v", r.Response)
+		log.Printf("Request reponse - redirect client : %v", r.UserAgent())
+		log.Println("======================")
+		//
 		user_id := session.SessionManager.Get(r.Context(), "user_id")
 
 		if user_id == nil {
@@ -57,6 +49,7 @@ func (cfg *ApiConfig) SessionMiddleware(next http.Handler) http.Handler {
 			}
 			ctx = context.WithValue(r.Context(), "msgs", msgs)
 			// redirect back
+			// http.Redirect(w, r.WithContext(ctx), "/test", http.StatusSeeOther)
 			respondWithError(
 				w,
 				http.StatusNotFound,
@@ -81,16 +74,17 @@ func (cfg *ApiConfig) AuthMiddleware(next http.Handler) http.Handler {
 		user := ctx.Value("user")
 
 		if user == nil {
-			// redirect user back, with message
-			respondWithError(
-				w,
-				http.StatusBadRequest,
-				"You need to be authenticated, No user from session",
-			)
+			// redirect user to login page
+
+			msgs := []map[string]string{
+				{"msg_type": "success", "msg": "Please login first"},
+			}
+			ctx = context.WithValue(ctx, "msgs", msgs)
+			// TODO:  context is lost in the redirect
+			http.Redirect(w, r.WithContext(ctx), "/login", http.StatusSeeOther)
 			return
 		}
 
-		// you will have user_id in the context from the sesison middleware
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

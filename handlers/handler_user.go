@@ -25,17 +25,24 @@ type UserRegisterParams struct {
 }
 
 func (cfg *ApiConfig) HandlerRegisterView(w http.ResponseWriter, r *http.Request) {
-	// MOve mesages to context
-	// msgs := []map[string]string{}
-	// ctx := context.WithValue(r.Context(), "msgs", msgs)
+	contextUser := r.Context().Value("user")
+	if contextUser != nil {
+		// Getout you are already loggedin
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
 	views.Register(map[string]string{}).Render(r.Context(), w)
 }
 
 func (cfg *ApiConfig) HandlerLoginView(w http.ResponseWriter, r *http.Request) {
-	// If user is loggedin redirect them back with a mesasge
-	// move messages to context
-	// msgs := []map[string]string{}
-	// ctx := context.WithValue(r.Context(), "msgs", msgs)
+	contextUser := r.Context().Value("user")
+	if contextUser != nil {
+		// Getout you are already loggedin
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
 	views.Login().Render(r.Context(), w)
 }
 
@@ -74,6 +81,13 @@ func (params *UserRegisterParams) Validate() bool {
 }
 
 func (cfg *ApiConfig) HandlerLogin(w http.ResponseWriter, r *http.Request) {
+	contextUser := r.Context().Value("user")
+	if contextUser != nil {
+		// Getout you are already loggedin
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
 	// If user is loggedin redirect them back with a mesasge
 	err := r.ParseForm()
 	if err != nil {
@@ -154,6 +168,13 @@ func (cfg *ApiConfig) HandlerLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func (cfg *ApiConfig) HandlerUsersCreate(w http.ResponseWriter, r *http.Request) {
+	user := r.Context().Value("user")
+	if user != nil {
+		// Getout you are already loggedin
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
 	err := r.ParseForm()
 	if err != nil {
 		log.Println("Failed to parse form", err)
@@ -172,11 +193,6 @@ func (cfg *ApiConfig) HandlerUsersCreate(w http.ResponseWriter, r *http.Request)
 		// msg := []map[string]string{}
 		views.Register(params.Errors).Render(r.Context(), w)
 		return
-		// http.Redirect(w, r, "/register", http.StatusSeeOther)
-		// https://blog.jetbrains.com/go/2022/11/08/build-a-blog-with-go-templates/#creating-the-routes
-		// http.Error(w, fmt.Sprintf("Validation error"), http.StatusBadRequest)
-		// return
-
 	}
 
 	hashedPassword, err := HashPassword(params.Password)
