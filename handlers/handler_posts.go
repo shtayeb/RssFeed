@@ -8,7 +8,8 @@ import (
 	"github.com/shtayeb/rssfeed/internal/models"
 )
 
-func (cfg *ApiConfig) HandlerPostsGet(w http.ResponseWriter, r *http.Request, user database.User) {
+func (cfg *ApiConfig) HandlerPostsGet(w http.ResponseWriter, r *http.Request) {
+	user := r.Context().Value("user").(database.User)
 	limitStr := r.URL.Query().Get("limit")
 	limit := 10
 	if specifiedLimit, err := strconv.Atoi(limitStr); err == nil {

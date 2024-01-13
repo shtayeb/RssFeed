@@ -11,7 +11,9 @@ import (
 	"github.com/shtayeb/rssfeed/internal/models"
 )
 
-func (cfg *ApiConfig) HandlerFeedFollowsGet(w http.ResponseWriter, r *http.Request, user database.User) {
+func (cfg *ApiConfig) HandlerFeedFollowsGet(w http.ResponseWriter, r *http.Request) {
+	user := r.Context().Value("user").(database.User)
+
 	feedFollows, err := cfg.DB.GetFeedFollowsForUser(r.Context(), user.ID)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Couldn't create feed follow")
@@ -21,7 +23,8 @@ func (cfg *ApiConfig) HandlerFeedFollowsGet(w http.ResponseWriter, r *http.Reque
 	respondWithJSON(w, http.StatusOK, models.DatabaseFeedFollowsToFeedFollows(feedFollows))
 }
 
-func (cfg *ApiConfig) HandlerFeedFollowCreate(w http.ResponseWriter, r *http.Request, user database.User) {
+func (cfg *ApiConfig) HandlerFeedFollowCreate(w http.ResponseWriter, r *http.Request) {
+	user := r.Context().Value("user").(database.User)
 	type parameters struct {
 		FeedID int32
 	}
@@ -47,9 +50,12 @@ func (cfg *ApiConfig) HandlerFeedFollowCreate(w http.ResponseWriter, r *http.Req
 	respondWithJSON(w, http.StatusOK, models.DatabaseFeedFollowToFeedFollow(feedFollow))
 }
 
-func (cfg *ApiConfig) HandlerFeedFollowDelete(w http.ResponseWriter, r *http.Request, user database.User) {
+func (cfg *ApiConfig) HandlerFeedFollowDelete(
+	w http.ResponseWriter,
+	r *http.Request,
+) {
+	user := r.Context().Value("user").(database.User)
 	feedFollowID, err := strconv.Atoi(chi.URLParam(r, "feedFollowID"))
-
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Couldn't decode parameters")
 		return

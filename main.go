@@ -6,11 +6,7 @@ import (
 	"net/http"
 	"os"
 
-	// "time"
-
 	"github.com/a-h/templ"
-	// "github.com/alexedwards/scs/postgresstore"
-	// "github.com/alexedwards/scs/v2"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
@@ -45,7 +41,8 @@ func main() {
 	apiCfg := handlers.ApiConfig{
 		DB: dbQueries,
 	}
-	//
+
+	// Sesison Manager
 	session.InitSessionManager(db)
 
 	router := chi.NewRouter()
@@ -57,29 +54,31 @@ func main() {
 		AllowCredentials: false,
 		MaxAge:           300,
 	}))
+
+	// Middlewares
 	router.Use(middleware.Logger)
 	// router.Use(middleware.Recoverer)
 	router.Use(session.SessionManager.LoadAndSave)
 	router.Use(apiCfg.SessionMiddleware)
+
+	// Static files handler
+	fs := http.FileServer(http.Dir("public"))
+	router.Handle("/static/*", http.StripPrefix("/static/", fs))
+
 	// Public Routes
 	router.Group(func(r chi.Router) {
 		r.Get("/", apiCfg.HandlerLandingPage)
-
 		r.Get("/login", apiCfg.HandlerLoginView)
 		r.Post("/login", apiCfg.HandlerLogin)
 
 		r.Get("/register", apiCfg.HandlerRegisterView)
 		r.Post("/register", apiCfg.HandlerUsersCreate)
 
-		r.Get("/feeds", apiCfg.HandlerGetFeeds)
-
 		r.Get("/healthz", handlers.HandlerReadiness)
 		r.Get("/err", handlers.HandlerErr)
 	})
 
-	// Private Routes
-	// Require Authentication
-
+	// Private Routes - Require Authentication
 	router.Group(func(ar chi.Router) {
 		ar.Use(apiCfg.AuthMiddleware)
 		ar.Get("/home", templ.Handler(views.Home()).ServeHTTP)
@@ -88,12 +87,12 @@ func main() {
 		ar.Get("/feeds", apiCfg.HandlerFeedCreate)
 		ar.Post("/feeds", apiCfg.HandlerFeedStore)
 
-		// router.Get("/feed_follows", apiCfg.middlewareAuth(apiCfg.handlerFeedFollowsGet))
-		// router.Post("/feed_follows", apiCfg.middlewareAuth(apiCfg.handlerFeedFollowCreate))
-		// router.Delete("/feed_follows/{feedFollowID}", apiCfg.middlewareAuth(apiCfg.handlerFeedFollowDelete))
+		ar.Get("/feeds/following", apiCfg.HandlerFeedFollowsGet)
+		ar.Post("/feeds/following", apiCfg.HandlerFeedFollowCreate)
+		ar.Delete("/feeds/following/{feedFollowID}", apiCfg.HandlerFeedFollowDelete)
 
-		// router.Get("/posts", apiCfg.middlewareAuth(apiCfg.handlerPostsGet))
-		// router.Get("/users", apiCfg.middlewareAuth(apiCfg.handlerUsersGet))
+		ar.Get("/posts", apiCfg.HandlerPostsGet)
+		ar.Get("/users", apiCfg.HandlerUsersGet)
 	})
 
 	srv := &http.Server{

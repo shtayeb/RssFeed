@@ -1,15 +1,15 @@
 
 package views
-import "github.com/shtayeb/rssfeed/internal/database"
 
+import "github.com/shtayeb/rssfeed/internal/database"
 
 templ FeedLi(feed database.Feed) {
 	<tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-		<td class="p-4 align-middle ">{feed.Name}</td>
-		<td class="p-4 align-middle ">{feed.Url}</td>
+		<td class="p-4 align-middle ">{ feed.Name }</td>
+		<td class="p-4 align-middle ">{ feed.Url }</td>
 		<td class="p-4 align-middle ">
-      Follow : Delete
-    </td>
+			Follow : Delete
+		</td>
 	</tr>
 }
 
@@ -62,17 +62,15 @@ templ Feeds(feeds []database.Feed) {
 									<th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">
 										URL
 									</th>
-									
 									<th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">
-									Actions	
+										Actions	
 									</th>
 								</tr>
 							</thead>
 							<tbody class="[&_tr:last-child]:border-0" id="feeds-list">
-
-					for _,feed := range feeds {
-              @FeedLi(feed)
-          }
+								for _,feed := range feeds {
+									@FeedLi(feed)
+								}
 							</tbody>
 						</table>
 					</div>

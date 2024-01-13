@@ -14,7 +14,6 @@ templ renderMessages(messages []map[string]string) {
 	}
 }
 
-
 templ Login() {
 	@bareLayout() {
 		<div class="bg-gray-100 min-h-screen flex items-center justify-center">
@@ -33,10 +32,9 @@ templ Login() {
 						.
 					</p>
 				</div>
-
-			if ctx.Value("msgs") != nil {
-				@renderMessages(ctx.Value("msgs").([]map[string]string))
-      }
+				if ctx.Value("msgs") != nil {
+					@renderMessages(ctx.Value("msgs").([]map[string]string))
+				}
 				<form class="space-y-4" method="POST" action="/login">
 					<div class="space-y-2">
 						<div class="space-y-2">
@@ -95,6 +93,7 @@ templ Login() {
 		</div>
 	}
 }
+
 // [
 // 	{
 // 		"type" :"string",
@@ -125,10 +124,9 @@ templ Register(errors map[string]string) {
 						.
 					</p>
 				</div>
-
-			if ctx.Value("msgs") != nil {
-				@renderMessages(ctx.Value("msgs").([]map[string]string))
-      }
+				if ctx.Value("msgs") != nil {
+					@renderMessages(ctx.Value("msgs").([]map[string]string))
+				}
 				<form class="space-y-4" method="POST" action="/register">
 					<div class="space-y-2">
 						<div>

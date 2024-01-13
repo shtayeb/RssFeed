@@ -14,3 +14,7 @@
 
 - CSRF token protection for the forms
 - Check django for any other userful data to be included in the context
+- Check the laravel readirect()->back() and implement it for the GO
+
+- Create page for post list, feed following pages
+- Create feed follow CRUD

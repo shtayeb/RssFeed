@@ -227,7 +227,8 @@ func (cfg *ApiConfig) HandlerUsersCreate(w http.ResponseWriter, r *http.Request)
 	views.Register(params.Errors).Render(ctx, w)
 }
 
-func (cfg *ApiConfig) HandlerUsersGet(w http.ResponseWriter, r *http.Request, user database.User) {
+func (cfg *ApiConfig) HandlerUsersGet(w http.ResponseWriter, r *http.Request) {
+	user := r.Context().Value("user").(database.User)
 	respondWithJSON(w, http.StatusOK, models.DatabaseUserToUser(user))
 }
 
