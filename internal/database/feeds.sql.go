@@ -45,6 +45,50 @@ func (q *Queries) CreateFeed(ctx context.Context, arg CreateFeedParams) (Feed, e
 	return i, err
 }
 
+const deleteFeed = `-- name: DeleteFeed :one
+DELETE FROM feeds WHERE id = $1 AND user_id = $2  
+RETURNING id, created_at, updated_at, name, url, user_id, last_fetched_at
+`
+
+type DeleteFeedParams struct {
+	ID     int32
+	UserID int32
+}
+
+func (q *Queries) DeleteFeed(ctx context.Context, arg DeleteFeedParams) (Feed, error) {
+	row := q.db.QueryRowContext(ctx, deleteFeed, arg.ID, arg.UserID)
+	var i Feed
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Name,
+		&i.Url,
+		&i.UserID,
+		&i.LastFetchedAt,
+	)
+	return i, err
+}
+
+const getFeed = `-- name: GetFeed :one
+SELECT id, created_at, updated_at, name, url, user_id, last_fetched_at FROM feeds WHERE id = $1
+`
+
+func (q *Queries) GetFeed(ctx context.Context, id int32) (Feed, error) {
+	row := q.db.QueryRowContext(ctx, getFeed, id)
+	var i Feed
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Name,
+		&i.Url,
+		&i.UserID,
+		&i.LastFetchedAt,
+	)
+	return i, err
+}
+
 const getFeeds = `-- name: GetFeeds :many
 SELECT id, created_at, updated_at, name, url, user_id, last_fetched_at FROM feeds
 `

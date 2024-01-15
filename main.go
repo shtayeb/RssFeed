@@ -86,6 +86,7 @@ func main() {
 
 		ar.Get("/feeds", apiCfg.HandlerFeedCreate)
 		ar.Post("/feeds", apiCfg.HandlerFeedStore)
+		ar.Delete("/feeds/{feed}", apiCfg.HandlerFeedDelete)
 
 		ar.Get("/feeds/following", apiCfg.HandlerFeedFollowsGet)
 		ar.Post("/feeds/following", apiCfg.HandlerFeedFollowCreate)

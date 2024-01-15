@@ -5,10 +5,56 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/shtayeb/rssfeed/internal/database"
 	"github.com/shtayeb/rssfeed/internal/models"
 	"github.com/shtayeb/rssfeed/views"
 )
+
+func (cfg *ApiConfig) HandlerFeedDelete(w http.ResponseWriter, r *http.Request) {
+	feedId := chi.URLParam(r, "feed")
+	// feedFollowID, err := strconv.Atoi(chi.URLParam(r, "feedFollowID"))
+	log.Printf("=== FEED ID === : %v", feedId)
+	return
+	// if err != nil {
+	// 	log.Println(err)
+	// 	respondWithError(w, http.StatusInternalServerError, "Invalid feed ID")
+	// 	return
+	//
+	// }
+	//
+	// user := r.Context().Value("user").(database.User)
+	// feed, err := cfg.DB.GetFeed(r.Context(), int32(feedId))
+	// if err != nil {
+	// 	respondWithError(w, http.StatusInternalServerError, "Couldn't get feed")
+	// 	return
+	// }
+	//
+	// // Authorization
+	// if user.ID != feed.UserID {
+	// 	respondWithError(
+	// 		w,
+	// 		http.StatusInternalServerError,
+	// 		"You are not authorized to delete this feed",
+	// 	)
+	// 	return
+	// }
+	// param := database.DeleteFeedParams{
+	// 	ID:     feed.ID,
+	// 	UserID: user.ID,
+	// }
+	// _, err = cfg.DB.DeleteFeed(r.Context(), param)
+	// if err != nil {
+	// 	respondWithError(
+	// 		w,
+	// 		http.StatusInternalServerError,
+	// 		"Failed to delete the feed",
+	// 	)
+	// 	return
+	// }
+	// // customize this
+	// views.FeedLi(feed).Render(r.Context(), w)
+}
 
 func (cfg *ApiConfig) HandlerFeedCreate(w http.ResponseWriter, r *http.Request) {
 	// feeds/create

@@ -1,21 +1,40 @@
-
 package views
 
 import "github.com/shtayeb/rssfeed/internal/database"
+import "fmt"
 
 templ FeedLi(feed database.Feed) {
 	<tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
 		<td class="p-4 align-middle ">{ feed.Name }</td>
 		<td class="p-4 align-middle ">{ feed.Url }</td>
 		<td class="p-4 align-middle ">
-			Follow : Delete
+			<form
+				method="delete"
+				hx-delete="/feeds/following/feedFollowI"
+				hx-ext="disable-element"
+				hx-disable-element="this"
+				hx-confirm="Are you sure?"
+				hx-indicator=".progress"
+			>
+				<button type="submit" class="bg-yellow-400 px-3 py-2">Unfollow</button>
+			</form>
+			<form
+				hx-delete={ fmt.Sprintf("/feeds/%v",feed.ID) }
+				hx-ext="disable-element"
+				hx-disable-element="this"
+				hx-confirm="Are you sure?"
+				hx-indicator=".progress"
+				class="bg-red-300 px-3 py-2"
+			>
+				<button type="submit">Delete</button>
+			</form>
 		</td>
 	</tr>
 }
 
 templ Feeds(feeds []database.Feed) {
 	@layout() {
-		<div class="grid grid-cols-1 lg:grid-cols-1 gap-6 px-4 py-6 max-w-screen-xl mx-auto px-4 md:px-6">
+		<div class="grid grid-cols-1 lg:grid-cols-1 gap-6 py-6 max-w-screen-xl mx-auto px-4 md:px-6">
 			<div class="max-h-96 bg-white  rounded-lg border shadow-sm" data-v0-t="card">
 				<div class="flex flex-col space-y-1.5 p-6">
 					<h3 class="text-2xl font-semibold leading-none tracking-tight">Add a New Feed</h3>
@@ -25,6 +44,7 @@ templ Feeds(feeds []database.Feed) {
 					<form class="gap-4 flex" hx-post="/feeds" hx-trigger="submit" hx-target="#feeds-list" hx-swap="afterbegin" hx-on::after-request="this.reset()">
 						<div class="w-full">
 							<input
+								required
 								class="flex h-10 w-full rounded-md border-2 bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
 								id="name"
 								placeholder="Enter feed's name"
@@ -33,6 +53,7 @@ templ Feeds(feeds []database.Feed) {
 						</div>
 						<div class="w-full">
 							<input
+								required
 								class="flex h-10 w-full rounded-md border-2 border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
 								id="url"
 								placeholder="Enter feed's url"

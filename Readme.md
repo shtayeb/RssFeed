@@ -18,3 +18,4 @@
 
 - Create page for post list, feed following pages
 - Create feed follow CRUD
+-[x] Build a dark theme based on color inverting check the extention for reference

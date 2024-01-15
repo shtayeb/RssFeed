@@ -1,32 +1,22 @@
 package views
 
-
 templ bareLayout() {
 	<!DOCTYPE html>
 	<html class="">
 		<head>
 			<title>RSS Feed</title>
-      <script src="/static/js/htmx.min.js"></script>
-      <link rel="stylesheet" href="/static/css/styles.css"/>
-			<script src="https://cdn.tailwindcss.com"></script>
-			
-      <script>
-				tailwind.config = {
-					darkMode: "class",
-					theme: {
-						extend: {
-							colors: {
-								clifford: '#da373d',
-							}
-						}
-					}
-				}
-			</script>
+			<script src="/static/js/htmx.min.js"></script>
+			<link rel="stylesheet" href="/static/css/styles.css"/>
 		</head>
 		<body class="dark">
-			<div class="flex flex-col min-h-screen">
+ <div class="progress bg-dark h-1">
+            <div class="indeterminate bg-dark-light"></div>
+        </div>
+			<div class="flex bg-gray-50 flex-col min-h-screen">
 				{ children... }
 			</div>
+
+			<script src="/static/js/main.js"></script>
 		</body>
 	</html>
 }
@@ -36,86 +26,76 @@ templ layout() {
 	<html class="">
 		<head>
 			<title>RSS Feed</title>
-
-      <script src="/static/js/htmx.min.js"></script>
-      <link rel="stylesheet" href="/static/css/styles.css"/>
-			<script src="https://cdn.tailwindcss.com"></script>
-			
-			<script>
-				tailwind.config = {
-					darkMode: "class",
-					theme: {
-						extend: {
-							colors: {
-								clifford: '#da373d',
-							}
-						}
-					}
-				}
-			</script>
+			<script src="/static/js/htmx.min.js"></script>
+			<link rel="stylesheet" href="/static/css/styles.css"/>
 		</head>
 		<body class="dark">
-			<div class="flex flex-col min-h-screen">
+ <div class="progress bg-dark h-1">
+            <div class="indeterminate bg-dark-light"></div>
+        </div>
+			<div class="bg-gray-50 flex flex-col min-h-screen">
 				@navbar()
-         
-			if ctx.Value("msgs") != nil {
-				@renderMessages(ctx.Value("msgs").([]map[string]string))
-      }
+				if ctx.Value("msgs") != nil {
+					@renderMessages(ctx.Value("msgs").([]map[string]string))
+				}
 				<main class="flex-1 ">
 					{ children... }
 				</main>
 				@footer()
 			</div>
+<script src="/static/js/main.js"></script>
+
 		</body>
 	</html>
 }
 
-
-
-templ navbar(){
-	<header class="h-14 flex items-center container max-w-screen-xl mx-auto border-b px-4 md:px-6">
-		<a href="/">
-			<h1 class="text-2xl font-bold">TECH FEED</h1>
-		</a>
-		<nav class="ml-auto flex gap-4 sm:gap-6">
-			<a referrerpolicy="no-referrer" class="text-sm font-medium hover:underline underline-offset-4" href="/home">
-				Home
+templ navbar() {
+	<header class="bg-white ">
+		<div class="max-w-screen-xl h-14 px-4 md:px-6 flex items-center container mx-auto border-b ">
+			<a href="/">
+				<h1 class="text-2xl font-bold">TECH FEED</h1>
 			</a>
-			<a class="text-sm font-medium hover:underline underline-offset-4" href="/feeds">
-				Feed
-			</a>
-			if ctx.Value("user") != nil {
-				<form method="post" action="/logout">
-					<button class="text-sm font-medium hover:underline underline-offset-4" type="submit">
-						Logout	
-					</button>
-				</form>
-			} else {
-				<a class="text-sm font-medium hover:underline underline-offset-4" href="/register">
-					Register
+			<nav class="ml-auto flex gap-4 sm:gap-6">
+<button id="invmode" class="cont-inv" tabindex="2">Dark Mode</button>
+				<a referrerpolicy="no-referrer" class="text-sm font-medium hover:underline underline-offset-4" href="/home">
+					Home
 				</a>
-				<a class="text-sm font-medium hover:underline underline-offset-4" href="/login">
-					Login
+				<a class="text-sm font-medium hover:underline underline-offset-4" href="/feeds">
+					Feed
 				</a>
-			}
-		</nav>
+				if ctx.Value("user") != nil {
+					<form method="post" action="/logout">
+						<button class="text-sm font-medium hover:underline underline-offset-4" type="submit">
+							Logout
+						</button>
+					</form>
+				} else {
+					<a class="text-sm font-medium hover:underline underline-offset-4" href="/register">
+						Register
+					</a>
+					<a class="text-sm font-medium hover:underline underline-offset-4" href="/login">
+						Login
+					</a>
+				}
+			</nav>
+		</div>
 	</header>
 }
 
-templ footer(){
-	<footer class="flex flex-col gap-2 sm:flex-row py-6 px-4 md:px-6 w-full shrink-0 items-center border-t container max-w-screen-xl mx-auto">
-		<p class="text-xs text-gray-500 ">
-			©  RSS Feed Aggregator. All rights reserved.
-		</p>
-		<nav class="sm:ml-auto flex gap-4 sm:gap-6">
-			<a class="text-xs hover:underline underline-offset-4" href="#">
-				Terms of Service
-			</a>
-			<a class="text-xs hover:underline underline-offset-4" href="#">
-				Privacy
-			</a>
-		</nav>
+templ footer() {
+	<footer class="bg-white">
+		<div class=" flex flex-col gap-2 sm:flex-row py-6 px-4 md:px-6 w-full shrink-0 items-center border-t container max-w-screen-xl mx-auto">
+			<p class="text-xs text-gray-500 ">
+				©  RSS Feed Aggregator. All rights reserved.
+			</p>
+			<nav class="sm:ml-auto flex gap-4 sm:gap-6">
+				<a class="text-xs hover:underline underline-offset-4" href="#">
+					Terms of Service
+				</a>
+				<a class="text-xs hover:underline underline-offset-4" href="#">
+					Privacy
+				</a>
+			</nav>
+		</div>
 	</footer>
 }
-
-
