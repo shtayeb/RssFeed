@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/a-h/templ"
-	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
@@ -86,7 +86,7 @@ func main() {
 
 		ar.Get("/feeds", apiCfg.HandlerFeedCreate)
 		ar.Post("/feeds", apiCfg.HandlerFeedStore)
-		ar.Delete("/feeds/{feed}", apiCfg.HandlerFeedDelete)
+		ar.Delete("/feeds/{feedID}", apiCfg.HandlerFeedDelete)
 
 		ar.Get("/feeds/following", apiCfg.HandlerFeedFollowsGet)
 		ar.Post("/feeds/following", apiCfg.HandlerFeedFollowCreate)

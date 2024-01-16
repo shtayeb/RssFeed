@@ -3,6 +3,7 @@ package handlers
 import (
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -12,48 +13,47 @@ import (
 )
 
 func (cfg *ApiConfig) HandlerFeedDelete(w http.ResponseWriter, r *http.Request) {
-	feedId := chi.URLParam(r, "feed")
-	// feedFollowID, err := strconv.Atoi(chi.URLParam(r, "feedFollowID"))
-	log.Printf("=== FEED ID === : %v", feedId)
-	return
-	// if err != nil {
-	// 	log.Println(err)
-	// 	respondWithError(w, http.StatusInternalServerError, "Invalid feed ID")
-	// 	return
-	//
-	// }
-	//
-	// user := r.Context().Value("user").(database.User)
-	// feed, err := cfg.DB.GetFeed(r.Context(), int32(feedId))
-	// if err != nil {
-	// 	respondWithError(w, http.StatusInternalServerError, "Couldn't get feed")
-	// 	return
-	// }
-	//
+	feedId, err := strconv.Atoi(chi.URLParam(r, "feedID"))
+	if err != nil {
+		log.Println(err)
+		respondWithError(w, http.StatusInternalServerError, "Invalid feed ID")
+		return
+
+	}
+
+	user := r.Context().Value("user").(database.User)
+	feed, err := cfg.DB.GetFeed(r.Context(), int32(feedId))
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Couldn't get feed")
+		return
+	}
+
 	// // Authorization
-	// if user.ID != feed.UserID {
-	// 	respondWithError(
-	// 		w,
-	// 		http.StatusInternalServerError,
-	// 		"You are not authorized to delete this feed",
-	// 	)
-	// 	return
-	// }
-	// param := database.DeleteFeedParams{
-	// 	ID:     feed.ID,
-	// 	UserID: user.ID,
-	// }
-	// _, err = cfg.DB.DeleteFeed(r.Context(), param)
-	// if err != nil {
-	// 	respondWithError(
-	// 		w,
-	// 		http.StatusInternalServerError,
-	// 		"Failed to delete the feed",
-	// 	)
-	// 	return
-	// }
-	// // customize this
+	if user.ID != feed.UserID {
+		respondWithError(
+			w,
+			http.StatusInternalServerError,
+			"You are not authorized to delete this feed",
+		)
+		return
+	}
+
+	param := database.DeleteFeedParams{
+		ID:     feed.ID,
+		UserID: user.ID,
+	}
+	err = cfg.DB.DeleteFeed(r.Context(), param)
+	if err != nil {
+		respondWithError(
+			w,
+			http.StatusInternalServerError,
+			"Failed to delete the feed",
+		)
+		return
+	}
+	// customize this
 	// views.FeedLi(feed).Render(r.Context(), w)
+	return
 }
 
 func (cfg *ApiConfig) HandlerFeedCreate(w http.ResponseWriter, r *http.Request) {

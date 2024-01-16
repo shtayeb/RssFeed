@@ -19,3 +19,8 @@
 - Create page for post list, feed following pages
 - Create feed follow CRUD
 -[x] Build a dark theme based on color inverting check the extention for reference
+- /feed/{feedId}/posts
+- /feeds scoped to the user
+- /posts
+- /Home -> a customized page with recommnedation for the discovering new feeds
+

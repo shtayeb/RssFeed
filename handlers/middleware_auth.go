@@ -21,12 +21,12 @@ func (cfg *ApiConfig) SessionMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		log.Println("=========This is for the session redirec: =============")
-		log.Printf("The full url, Host and RequestURI: %v   -----   %v", r.Host, r.RequestURI)
-		log.Printf("This is a try to get origin url: %v", r.Referer())
-		log.Printf("Request reponse - redirect client : %v", r.Response)
-		log.Printf("Request reponse - redirect client : %v", r.UserAgent())
-		log.Println("======================")
+		// log.Println("=========This is for the session redirec: =============")
+		// log.Printf("The full url, Host and RequestURI: %v   -----   %v", r.Host, r.RequestURI)
+		// log.Printf("This is a try to get origin url: %v", r.Referer())
+		// log.Printf("Request reponse - redirect client : %v", r.Response)
+		// log.Printf("Request reponse - redirect client : %v", r.UserAgent())
+		// log.Println("======================")
 		//
 		user_id := session.SessionManager.Get(r.Context(), "user_id")
 

@@ -3,9 +3,8 @@ INSERT INTO feeds (created_at, updated_at, name, url, user_id)
 VALUES ($1, $2, $3, $4, $5)
 RETURNING *;
 
--- name: DeleteFeed :one
-DELETE FROM feeds WHERE id = $1 AND user_id = $2  
-RETURNING *;
+-- name: DeleteFeed :exec
+DELETE FROM feeds WHERE id = $1 AND user_id = $2;  
 
 -- name: GetFeed :one
 SELECT * FROM feeds WHERE id = $1;
