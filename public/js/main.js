@@ -1,4 +1,22 @@
+console.log("This is the main js")
+
+/* Dark mode */
+if 
+(
+  (
+    !localStorage.darkMode &&
+    window.matchMedia("(prefers-color-scheme: dark)").matches) ||
+localStorage.darkMode === "true"
+) 
+{
+  document.getElementsByTagName("html")[0].classList.toggle("inverted");
+}
+
+
+
 const darkModeToggleBtn = document.querySelector("#invmode");
+if(darkModeToggleBtn){
+
 darkModeToggleBtn.addEventListener("click", () => {
   // console.log("clicked",document.getElementsByTagName('html')[0].style["filter"])
 document.getElementsByTagName("html")[0].classList.toggle("inverted");
@@ -11,14 +29,4 @@ document.getElementsByTagName("html")[0].classList.toggle("inverted");
   }
 });
 
-/* Dark mode */
-if 
-(
-  (
-    !localStorage.darkMode &&
-    window.matchMedia("(prefers-color-scheme: dark)").matches) ||
-localStorage.darkMode === "true"
-) 
-{
-  document.getElementsByTagName("html")[0].classList.toggle("inverted");
 }

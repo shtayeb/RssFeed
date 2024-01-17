@@ -6,12 +6,6 @@ import (
 	"github.com/shtayeb/rssfeed/views"
 )
 
-func (cfg *ApiConfig) HandlerTestPage(w http.ResponseWriter, r *http.Request) {
-	// templ.Handler(views.NotFoundComponent()).ServeHTTP(w, r)
-	respondWithError(w, http.StatusInternalServerError, "success here in the middleware")
-	return
-}
-
 func (cfg *ApiConfig) HandlerLandingPage(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	feeds, err := cfg.DB.GetFeeds(ctx)

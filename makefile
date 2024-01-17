@@ -14,3 +14,7 @@ t-watch:
 .PHONY: serve
 serve:
 	air
+
+.PHONY: build 
+build:
+	go build

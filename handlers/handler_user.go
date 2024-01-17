@@ -162,7 +162,7 @@ func (cfg *ApiConfig) HandlerLogin(w http.ResponseWriter, r *http.Request) {
 	// 	Expires: time.Now().Add(120 * time.Second),
 	// })
 	// msg := []map[string]string{{"msg_type": "error", "msg": "Invalid Email or Password, Try Again!"}}
-	http.Redirect(w, r, "/home", http.StatusSeeOther)
+	http.Redirect(w, r, "/posts", http.StatusSeeOther)
 	// msg := []map[string]string{{"msg_type": "success", "msg": "Success !"}}
 	// views.Login(msg).Render(r.Context(), w)
 }

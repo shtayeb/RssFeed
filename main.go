@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/a-h/templ"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
@@ -14,7 +13,6 @@ import (
 	"github.com/shtayeb/rssfeed/handlers"
 	"github.com/shtayeb/rssfeed/internal/database"
 	"github.com/shtayeb/rssfeed/internal/session"
-	"github.com/shtayeb/rssfeed/views"
 
 	_ "github.com/lib/pq"
 )
@@ -81,7 +79,7 @@ func main() {
 	// Private Routes - Require Authentication
 	router.Group(func(ar chi.Router) {
 		ar.Use(apiCfg.AuthMiddleware)
-		ar.Get("/home", templ.Handler(views.Home()).ServeHTTP)
+		ar.Get("/posts", apiCfg.HandlerPostsPage)
 		ar.Post("/logout", apiCfg.HandlerLogout)
 
 		ar.Get("/feeds", apiCfg.HandlerFeedCreate)
@@ -92,7 +90,6 @@ func main() {
 		ar.Post("/feeds/following", apiCfg.HandlerFeedFollowCreate)
 		ar.Delete("/feeds/following/{feedFollowID}", apiCfg.HandlerFeedFollowDelete)
 
-		ar.Get("/posts", apiCfg.HandlerPostsGet)
 		ar.Get("/users", apiCfg.HandlerUsersGet)
 	})
 

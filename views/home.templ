@@ -2,51 +2,31 @@ package views
 
 import "github.com/shtayeb/rssfeed/internal/database"
 
-templ postCard(post database.Post) {
-	<a href={templ.URL(post.Url)} class="border border-gray-200 shadow-sm rounded-lg p-4">
+templ postCard(post database.GetPostsForUserRow)  {
+  <div class="border border-gray-200 shadow-sm rounded-lg p-4">
+	<a href={templ.URL(post.Url)} class="">
 		<h2 class="text-xl font-bold mb-2">{ post.Title }</h2>
-		<p class="text-sm text-gray-500 mb-2">This is the author</p>
-		<p class="text-gray-700">{ post.Description.String }</p>
 	</a>
+		<p class="text-sm text-gray-500 mb-2">{ post.PublishedAt.Time.Format("2006-01-02") }</p>
+    <a href={ templ.URL(post.FeedUrl) }>
+  		<p class="text-sm text-gray-500 mb-2">{ post.FeedName }</p>
+    </a>
+		<p class="text-gray-700">{ post.Description.String }</p>
+  </div>
 }
 
-templ Home() {
+templ Posts(posts []database.GetPostsForUserRow)  {
 	@layout() {
 		<section class="max-w-screen-xl mx-auto px-4 md:px-6">
 			<div class="py-8">
 				<h2 class="text-3xl font-bold mb-6">{ ctx.Value("user").(database.User).Name }:  Latest Posts</h2>
 				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-					<div class="border border-gray-200 shadow-sm rounded-lg p-4">
-						<h2 class="text-xl font-bold mb-2">Post Title 1</h2>
-						<p class="text-sm text-gray-500 mb-2">Author Name 1 • Publish Date 1</p>
-						<p class="text-gray-700">This is a snippet of the content for post 1...</p>
-					</div>
-					<div class="border border-gray-200 shadow-sm rounded-lg p-4">
-						<h2 class="text-xl font-bold mb-2">Post Title 2</h2>
-						<p class="text-sm text-gray-500 mb-2">Author Name 2 • Publish Date 2</p>
-						<p class="text-gray-700">This is a snippet of the content for post 2...</p>
-					</div>
-					<div class="border border-gray-200 shadow-sm rounded-lg p-4">
-						<h2 class="text-xl font-bold mb-2">Post Title 3</h2>
-						<p class="text-sm text-gray-500 mb-2">Author Name 3 • Publish Date 3</p>
-						<p class="text-gray-700">This is a snippet of the content for post 3...</p>
-					</div>
-					<div class="border border-gray-200 shadow-sm rounded-lg p-4">
-						<h2 class="text-xl font-bold mb-2">Post Title 4</h2>
-						<p class="text-sm text-gray-500 mb-2">Author Name 4 • Publish Date 4</p>
-						<p class="text-gray-700">This is a snippet of the content for post 4...</p>
-					</div>
-					<div class="border border-gray-200 shadow-sm rounded-lg p-4">
-						<h2 class="text-xl font-bold mb-2">Post Title 5</h2>
-						<p class="text-sm text-gray-500 mb-2">Author Name 5 • Publish Date 5</p>
-						<p class="text-gray-700">This is a snippet of the content for post 5...</p>
-					</div>
-					<div class="border border-gray-200 shadow-sm rounded-lg p-4">
-						<h2 class="text-xl font-bold mb-2">Post Title 6</h2>
-						<p class="text-sm text-gray-500 mb-2">Author Name 6 • Publish Date 6</p>
-						<p class="text-gray-700">This is a snippet of the content for post 6...</p>
-					</div>
-				</div>
+            
+        	for _,post:= range posts{
+              @postCard(post)
+					}
+
+        </div>
 				<div class="flex justify-center mt-8">
 					<button class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-8 py-2">
 						Load More
