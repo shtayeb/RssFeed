@@ -12,13 +12,36 @@ import (
 	"github.com/shtayeb/rssfeed/views"
 )
 
+func (cfg *ApiConfig) HandlerFeedPosts(w http.ResponseWriter, r *http.Request) {
+	// Get posts of a specific post
+	feedId, err := strconv.Atoi(chi.URLParam(r, "feedID"))
+	if err != nil {
+		log.Println(err)
+		respondWithError(w, http.StatusInternalServerError, "Invalid feed ID")
+		return
+	}
+
+	feed, err := cfg.DB.GetFeed(r.Context(), int32(feedId))
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Couldn't get feed")
+		return
+	}
+
+	posts, err := cfg.DB.GetFeedPosts(r.Context(), int32(feedId))
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Couldn't get feed")
+		return
+	}
+
+	views.FeedPosts(feed, models.DatabaseFeedPostToPostForUserRows(posts)).Render(r.Context(), w)
+}
+
 func (cfg *ApiConfig) HandlerFeedDelete(w http.ResponseWriter, r *http.Request) {
 	feedId, err := strconv.Atoi(chi.URLParam(r, "feedID"))
 	if err != nil {
 		log.Println(err)
 		respondWithError(w, http.StatusInternalServerError, "Invalid feed ID")
 		return
-
 	}
 
 	user := r.Context().Value("user").(database.User)
@@ -53,7 +76,6 @@ func (cfg *ApiConfig) HandlerFeedDelete(w http.ResponseWriter, r *http.Request) 
 	}
 	// customize this
 	// views.FeedLi(feed).Render(r.Context(), w)
-	return
 }
 
 func (cfg *ApiConfig) HandlerFeedCreate(w http.ResponseWriter, r *http.Request) {
