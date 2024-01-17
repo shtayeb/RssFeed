@@ -21,13 +21,19 @@ func (cfg *ApiConfig) HandlerFeedPosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	feed, err := cfg.DB.GetFeed(r.Context(), int32(feedId))
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Couldn't get feed")
+		return
+	}
+
 	posts, err := cfg.DB.GetFeedPosts(r.Context(), int32(feedId))
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Couldn't get feed")
 		return
 	}
 
-	views.Posts(models.DatabaseFeedPostToPostForUserRows(posts)).Render(r.Context(), w)
+	views.FeedPosts(feed, models.DatabaseFeedPostToPostForUserRows(posts)).Render(r.Context(), w)
 }
 
 func (cfg *ApiConfig) HandlerFeedDelete(w http.ResponseWriter, r *http.Request) {

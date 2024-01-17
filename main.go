@@ -104,7 +104,7 @@ func main() {
 	appEnv := os.Getenv("APP_ENV")
 	shouldFetch := true
 	if appEnv == "" || appEnv != "production" {
-		log.Fatal("Not fetching posts right now !")
+		log.Println("Not fetching posts right now !")
 		shouldFetch = false
 	}
 
