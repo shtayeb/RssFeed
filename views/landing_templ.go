@@ -11,6 +11,7 @@ import "io"
 import "bytes"
 
 import "github.com/shtayeb/rssfeed/internal/database"
+import "fmt"
 
 // Get latest feed
 // Later the most popular feeds
@@ -61,7 +62,7 @@ func Landing(feeds []database.Feed) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var5 templ.SafeURL = templ.SafeURL(feed.Url)
+				var templ_7745c5c3_Var5 templ.SafeURL = templ.URL(fmt.Sprintf("/feeds/%v/posts", feed.ID))
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var5)))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -73,7 +74,7 @@ func Landing(feeds []database.Feed) templ.Component {
 				var templ_7745c5c3_Var6 string
 				templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(feed.Name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views\landing.templ`, Line: 30, Col: 49}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views\landing.templ`, Line: 31, Col: 49}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 				if templ_7745c5c3_Err != nil {

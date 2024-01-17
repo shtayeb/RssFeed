@@ -1,3 +1,13 @@
+# [RSS FEED AGGREGATOR](https://rssfeed.cyclic.app/)
+An RSS feed aggragtor built with GO.
+
+## Tech Stack
+- GO
+- Templ
+- TailwindCSS
+- v0.dev
+
+
 ## TODO
 -[x] Use session management package
 - [x] Setup Middleware
@@ -20,6 +30,6 @@
 
 - feed following pages
 - Create feed follow CRUD
-- /feed/{feedId}/posts
+- /feed/{feedId}/posts -> make Post templ customizable
 - /feeds scoped to the user
 

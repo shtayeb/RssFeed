@@ -84,6 +84,7 @@ func main() {
 		ar.Post("/logout", apiCfg.HandlerLogout)
 
 		ar.Get("/feeds", apiCfg.HandlerFeedCreate)
+		ar.Get("/feeds/{feedID}/posts", apiCfg.HandlerFeedPosts)
 		ar.Post("/feeds", apiCfg.HandlerFeedStore)
 		ar.Delete("/feeds/{feedID}", apiCfg.HandlerFeedDelete)
 

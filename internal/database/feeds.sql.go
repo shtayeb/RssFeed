@@ -7,6 +7,7 @@ package database
 
 import (
 	"context"
+	"database/sql"
 	"time"
 )
 
@@ -76,6 +77,61 @@ func (q *Queries) GetFeed(ctx context.Context, id int32) (Feed, error) {
 		&i.LastFetchedAt,
 	)
 	return i, err
+}
+
+const getFeedPosts = `-- name: GetFeedPosts :many
+SELECT posts.id, posts.created_at, posts.updated_at, posts.title, posts.url, posts.description, posts.published_at, posts.feed_id, feeds.name as feed_name,feeds.url as feed_url 
+FROM posts 
+JOIN feeds ON feeds.id = posts.feed_id
+WHERE feed_id = $1
+ORDER BY posts.published_at DESC
+`
+
+type GetFeedPostsRow struct {
+	ID          int32
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	Title       string
+	Url         string
+	Description sql.NullString
+	PublishedAt sql.NullTime
+	FeedID      int32
+	FeedName    string
+	FeedUrl     string
+}
+
+func (q *Queries) GetFeedPosts(ctx context.Context, feedID int32) ([]GetFeedPostsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getFeedPosts, feedID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetFeedPostsRow
+	for rows.Next() {
+		var i GetFeedPostsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Title,
+			&i.Url,
+			&i.Description,
+			&i.PublishedAt,
+			&i.FeedID,
+			&i.FeedName,
+			&i.FeedUrl,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getFeeds = `-- name: GetFeeds :many
