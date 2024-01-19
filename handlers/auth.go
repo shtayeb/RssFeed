@@ -24,6 +24,61 @@ type UserRegisterParams struct {
 	Errors               map[string]string
 }
 
+func (cfg *ApiConfig) HandlerChangePassword(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	// Get the user from session
+	user := ctx.Value("user").(database.User)
+	// Get compare the hashed passwords
+	r.ParseForm()
+	currentPassword := r.PostFormValue("current_password")
+	newPassword := r.PostFormValue("new_password")
+	newPasswordConfirmation := r.PostFormValue("new_password_confirmation")
+
+	if currentPassword == "" || newPassword == "" || newPasswordConfirmation == "" {
+		// Invalid data
+		// return validation error
+		return
+	}
+
+	hashedCurrentPassword, _ := hashPassword(currentPassword)
+	if user.Password != hashedCurrentPassword {
+		// current password is wrong
+		return
+	}
+
+	// compare the password and password confirmation
+	if newPassword != newPasswordConfirmation {
+		// Password does not match
+		return
+	}
+
+	// Hash the nw password
+	hashedNewPassword, err := hashPassword(newPassword)
+	if err != nil {
+		// Could not hash the new password
+		return
+	}
+
+	// Update the user in db
+	err = cfg.DB.ChangeUserPassword(
+		ctx,
+		database.ChangeUserPasswordParams{Password: hashedNewPassword, ID: user.ID},
+	)
+	if err != nil {
+		// Could not update the DB, try again
+		return
+	}
+	// Invalidate the session - logout user
+	err = session.SessionManager.Destroy(r.Context())
+	if err != nil {
+		log.Println("Failed to Destroy the session")
+		return
+	}
+	http.Redirect(w, r, "/login", http.StatusSeeOther)
+	return
+	// return something for htmx
+}
+
 func (cfg *ApiConfig) HandlerRegisterView(w http.ResponseWriter, r *http.Request) {
 	contextUser := r.Context().Value("user")
 	if contextUser != nil {
@@ -46,7 +101,7 @@ func (cfg *ApiConfig) HandlerLoginView(w http.ResponseWriter, r *http.Request) {
 	views.Login().Render(r.Context(), w)
 }
 
-func HashPassword(password string) (string, error) {
+func hashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 	return string(bytes), err
 }
@@ -131,26 +186,9 @@ func (cfg *ApiConfig) HandlerLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// ses, err := cfg.DB.CreateSession(r.Context(), database.CreateSessionParams{
-	// 	ID:        uuid.New(),
-	// 	UserID:    user.ID,
-	// 	ExpiresAt: sql.NullTime{},
-	// })
-	// if err != nil {
-	// 	log.Println("Failed to create seesion in the the Database", err)
-	// 	msg := []map[string]string{
-	// 		{"msg_type": "error", "msg": "Something went wrong. Please try again!"},
-	// 	}
-	// 	views.Login(msg).Render(r.Context(), w)
-	//
-	// 	return
-	// }
 	// Set the seesion ID in the cookie
 	log.Printf("Login: loggedin user: %v ", user.ID)
 	session.SessionManager.Put(r.Context(), "user_id", user.ID)
-
-	// token, time, err := session.SessionManager.Commit(r.Context())
-	// log.Printf("Login: Commit session: %v in the time: %v", token, time)
 
 	user_id := session.SessionManager.GetInt(r.Context(), "user_id")
 
@@ -163,8 +201,6 @@ func (cfg *ApiConfig) HandlerLogin(w http.ResponseWriter, r *http.Request) {
 	// })
 	// msg := []map[string]string{{"msg_type": "error", "msg": "Invalid Email or Password, Try Again!"}}
 	http.Redirect(w, r, "/posts", http.StatusSeeOther)
-	// msg := []map[string]string{{"msg_type": "success", "msg": "Success !"}}
-	// views.Login(msg).Render(r.Context(), w)
 }
 
 func (cfg *ApiConfig) HandlerUsersCreate(w http.ResponseWriter, r *http.Request) {
@@ -195,7 +231,7 @@ func (cfg *ApiConfig) HandlerUsersCreate(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	hashedPassword, err := HashPassword(params.Password)
+	hashedPassword, err := hashPassword(params.Password)
 	if err != nil {
 		log.Println("Failed to hash the password", err)
 	}

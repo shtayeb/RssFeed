@@ -237,19 +237,6 @@ func Login() templ.Component {
 	})
 }
 
-// [
-// 	{
-// 		"type" :"string",
-// 		"msg": "string",
-// 	}
-// ]
-
-//	type Message struct {
-//		msg_type string `json:"msg_type"`
-//		msg string `json:"msg"`
-//	}
-//
-// []map[string]string{{"msg_type": "error", "msg": "Could not create user"}}
 func Register(errors map[string]string) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
@@ -350,7 +337,7 @@ func Register(errors map[string]string) templ.Component {
 				var templ_7745c5c3_Var27 string
 				templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(errors["Name"])
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views\auth.templ`, Line: 148, Col: 25}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views\auth.templ`, Line: 136, Col: 25}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
 				if templ_7745c5c3_Err != nil {
@@ -374,7 +361,7 @@ func Register(errors map[string]string) templ.Component {
 				var templ_7745c5c3_Var29 string
 				templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinStringErrs(errors["Email"])
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views\auth.templ`, Line: 169, Col: 26}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views\auth.templ`, Line: 157, Col: 26}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
 				if templ_7745c5c3_Err != nil {
@@ -398,7 +385,7 @@ func Register(errors map[string]string) templ.Component {
 				var templ_7745c5c3_Var31 string
 				templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinStringErrs(errors["Username"])
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views\auth.templ`, Line: 190, Col: 29}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views\auth.templ`, Line: 178, Col: 29}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
 				if templ_7745c5c3_Err != nil {
@@ -422,7 +409,7 @@ func Register(errors map[string]string) templ.Component {
 				var templ_7745c5c3_Var33 string
 				templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.JoinStringErrs(errors["Password"])
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views\auth.templ`, Line: 211, Col: 29}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views\auth.templ`, Line: 199, Col: 29}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var33))
 				if templ_7745c5c3_Err != nil {

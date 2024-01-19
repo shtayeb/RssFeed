@@ -4,7 +4,9 @@ export default {
     "./views/**/*.{templ,html}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      primary: "#000",
+    },
   },
   plugins: [
 require("@tailwindcss/forms")({

@@ -4,7 +4,7 @@ import "github.com/shtayeb/rssfeed/internal/database"
 import "fmt"
 
 templ FeedLi(feed database.Feed) {
-	<tr id={fmt.Sprintf("feed-%v",feed.ID)} class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+	<tr id={ fmt.Sprintf("feed-%v", feed.ID) } class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
 		<td class="p-4 align-middle ">{ feed.Name }</td>
 		<td class="p-4 align-middle ">{ feed.Url }</td>
 		<td class="p-4 flex items-center gap-3 ">
@@ -38,7 +38,7 @@ templ FeedLi(feed database.Feed) {
 			<form
 				hx-delete={ fmt.Sprintf("/feeds/%v", feed.ID) }
 				hx-ext="disable-element"
-        hx-target={ fmt.Sprintf("#feed-%v",feed.ID) }
+				hx-target={ fmt.Sprintf("#feed-%v", feed.ID) }
 				hx-disable-element="this"
 				hx-confirm="Are you sure?"
 				hx-indicator=".progress"

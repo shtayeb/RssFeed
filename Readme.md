@@ -28,6 +28,9 @@ An RSS feed aggragtor built with GO.
 - feed following pages
 - Create feed follow CRUD
 - /user/feeds scoped to the user
+- User profile management  
+    - Error handling with htmx
+    - Create a user profile dropdown for auth user
 
 - CSRF token protection for the forms
 - Check django requres object for any other userful data to be included in the context
