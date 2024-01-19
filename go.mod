@@ -1,6 +1,7 @@
 module github.com/shtayeb/rssfeed
 
-go 1.21
+go 1.21.4
+
 
 require github.com/joho/godotenv v1.5.1
 
@@ -10,6 +11,7 @@ require (
 	github.com/a-h/templ v0.2.513 // indirect
 	github.com/alexedwards/scs/postgresstore v0.0.0-20231113091146-cef4b05350c8 // indirect
 	github.com/alexedwards/scs/v2 v2.7.0 // indirect
+	github.com/angelofallars/htmx-go v0.4.1 // indirect
 	github.com/google/uuid v1.5.0 // indirect
 )
 

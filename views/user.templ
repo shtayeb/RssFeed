@@ -1,43 +1,44 @@
 package views
 
 import "github.com/shtayeb/rssfeed/internal/database"
-
+templ SuccessPartial(){
+  <p>
+      This is an htmx success partial
+  </p>
+}
 templ UserManagement() {
 	@layout() {
 		<section class="max-w-screen-xl px-4 md:px-6 mx-auto">
 			<div class="flex flex-col items-center justify-center">
 				<div class="w-full p-4 ">
 					<div class="flex items-center space-x-4 bg-white rounded-lg border shadow-sm p-4">
-
 						<span class="relative flex shrink-0 overflow-hidden rounded-full h-16 w-16">
-              <span class="flex h-full w-full items-center justify-center rounded-full bg-muted"> U </span>
-            </span>
+							<span class="flex h-full w-full items-center justify-center rounded-full bg-muted">U </span>
+						</span>
 						<div class="grid gap-1">
 							<div class="text-lg font-medium">{ ctx.Value("user").(database.User).Name }</div>
 							<div class="text-sm text-gray-500 ">{ ctx.Value("user").(database.User).Email }</div>
 						</div>
 					</div>
-
 					<div data-orientation="horizontal" role="none" class="shrink-0 h-[1px] w-full my-4"></div>
-          // Edit profile form
-					<form hx-post="/user" hx-trigger="submit" class="rounded-lg border bg-card text-card-foreground shadow-sm w-full bg-white" data-v0-t="card">
-						<div class="flex flex-col space-y-1.5 p-6">
+					// Edit profile form
+					<form hx-post="/user" hx-trigger="submit" hx-target="#user-post-message" class="rounded-lg border bg-card text-card-foreground shadow-sm w-full bg-white px-6" data-v0-t="card" hx-on::after-request="this.reset()">
+						<div class="flex flex-col space-y-1.5 ">
 							<h3 class="text-2xl font-semibold whitespace-nowrap leading-none tracking-tight">Edit Profile</h3>
 						</div>
-						<div class="p-6 space-y-4">
+            <div id="user-post-message" class="" >
+            </div>
+						<div class="space-y-4">
 							<div class="space-y-2">
 								<label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" for="current-password">Name</label>
 								<input required class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" id="name" name="name" type="text"/>
 							</div>
-
 						</div>
 						<div class="flex items-center p-6">
 							<button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-black text-white hover:bg-black/90 h-10 px-4 py-2 ml-auto" type="submit">Save</button>
 						</div>
 					</form>
-
 					<div data-orientation="horizontal" role="none" class="shrink-0 h-[1px] w-full my-4"></div>
-
 					<form hx-post="/user/change-password" hx-trigger="submit" class="rounded-lg border bg-card text-card-foreground shadow-sm w-full bg-white" data-v0-t="card">
 						<div class="flex flex-col space-y-1.5 p-6">
 							<h3 class="text-2xl font-semibold whitespace-nowrap leading-none tracking-tight">Change Password</h3>
@@ -56,8 +57,7 @@ templ UserManagement() {
 							<div class="space-y-2">
 								<label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" for="confirm-password">
 									Confirm Password
-
-                  </label>
+								</label>
 								<input required name="new_password_confirmation" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" id="confirm-password" type="password"/>
 							</div>
 						</div>
@@ -69,7 +69,6 @@ templ UserManagement() {
 					</form>
 					// End of password change
 					<div data-orientation="horizontal" role="none" class="shrink-0 bg-gray-100 h-[1px] w-full my-4"></div>
-
 					// Start of the notification form 
 					<div class="rounded-lg border bg-card text-card-foreground shadow-sm w-full bg-red-200" data-v0-t="card">
 						<div class="flex flex-col space-y-1.5 p-6">

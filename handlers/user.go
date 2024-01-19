@@ -3,6 +3,7 @@ package handlers
 import (
 	"net/http"
 
+	"github.com/angelofallars/htmx-go"
 	"github.com/shtayeb/rssfeed/internal/database"
 	"github.com/shtayeb/rssfeed/views"
 )
@@ -26,6 +27,8 @@ func (cfg *ApiConfig) HandlerProfileUpdate(w http.ResponseWriter, r *http.Reques
 	}
 
 	// return with success/failure message
+	htmx.NewResponse().
+		RenderTempl(r.Context(), w, views.SuccessPartial())
 }
 
 func (cfg *ApiConfig) HanlderUserProfile(w http.ResponseWriter, r *http.Request) {

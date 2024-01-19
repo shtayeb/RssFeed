@@ -1,4 +1,4 @@
-console.log("This is the main js")
+
 
 /* Dark mode */
 if 
@@ -30,3 +30,11 @@ document.getElementsByTagName("html")[0].classList.toggle("inverted");
 });
 
 }
+
+document.querySelector("#user-menu-dropdown-btn").addEventListener("click",()=>{
+  console.log("dropdown clicked")
+  document.querySelector("#user-menu-dropdown").classList.toggle('hidden')
+})
+
+
+
