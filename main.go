@@ -93,6 +93,9 @@ func main() {
 		ar.Delete("/feeds/following/{feedFollowID}", apiCfg.HandlerFeedFollowDelete)
 
 		ar.Get("/users", apiCfg.HandlerUsersGet)
+		ar.Get("/user/profile", apiCfg.HanlderUserProfile)
+		ar.Post("/user", apiCfg.HandlerProfileUpdate)
+		ar.Post("/user/change-password", apiCfg.HandlerChangePassword)
 	})
 
 	srv := &http.Server{

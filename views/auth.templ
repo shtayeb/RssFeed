@@ -94,18 +94,6 @@ templ Login() {
 	}
 }
 
-// [
-// 	{
-// 		"type" :"string",
-// 		"msg": "string",
-// 	}
-// ]
-
-// type Message struct {
-// 	msg_type string `json:"msg_type"`
-// 	msg string `json:"msg"`
-// }
-// []map[string]string{{"msg_type": "error", "msg": "Could not create user"}}
 templ Register(errors map[string]string) {
 	@bareLayout() {
 		<div class="bg-gray-100 min-h-screen flex items-center justify-center ">

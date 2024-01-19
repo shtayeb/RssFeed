@@ -3,7 +3,7 @@ package views
 import "github.com/shtayeb/rssfeed/internal/database"
 
 templ postCard(post database.GetPostsForUserRow) {
-	<div class="border border-gray-200 shadow-sm rounded-lg p-4">
+	<div class="border bg-white border-gray-200 shadow-sm rounded-lg p-4">
 		<a href={ templ.URL(post.Url) } class="">
 			<h2 class="text-xl font-bold mb-2">{ post.Title }</h2>
 		</a>

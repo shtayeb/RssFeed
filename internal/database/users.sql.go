@@ -10,6 +10,20 @@ import (
 	"time"
 )
 
+const changeUserPassword = `-- name: ChangeUserPassword :exec
+UPDATE users SET password = $1 WHERE id = $2
+`
+
+type ChangeUserPasswordParams struct {
+	Password string
+	ID       int32
+}
+
+func (q *Queries) ChangeUserPassword(ctx context.Context, arg ChangeUserPasswordParams) error {
+	_, err := q.db.ExecContext(ctx, changeUserPassword, arg.Password, arg.ID)
+	return err
+}
+
 const createUser = `-- name: CreateUser :one
 INSERT INTO users (created_at, updated_at, username,name,email,password)
 VALUES (
@@ -90,4 +104,18 @@ func (q *Queries) GetUserByEmailOrUsername(ctx context.Context, email string) (U
 		&i.Password,
 	)
 	return i, err
+}
+
+const updateUserName = `-- name: UpdateUserName :exec
+UPDATE users SET name = $1 WHERE id = $2
+`
+
+type UpdateUserNameParams struct {
+	Name string
+	ID   int32
+}
+
+func (q *Queries) UpdateUserName(ctx context.Context, arg UpdateUserNameParams) error {
+	_, err := q.db.ExecContext(ctx, updateUserName, arg.Name, arg.ID)
+	return err
 }
