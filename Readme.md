@@ -6,6 +6,7 @@ An RSS feed aggragtor built with GO.
 - Templ
 - TailwindCSS
 - v0.dev
+- GoatCounter for Analytics
 
 
 ## TODO
