@@ -10,25 +10,21 @@ templ progressIndicator() {
 
 templ RenderMessages(messages []map[string]string) {
 	if len(messages) != 0 {
-
-				<div id="messages" hx-swap-oob="true" hx-swap="outerHTML" class="py-4">
-				<div class="mx-auto space-y-3">
-				  
-		for _, m := range messages {
-			if m["msg_type"] =="error" {
-				<div id="" class="bg-red-100 px-6 py-3 text-center border border-red-500"><p>{ m["msg"] } </p> </div>
-			} else if m["msg_type"] == "success" {
-				<div id=""  class="bg-green-100 border border-green-500 px-6 py-3 text-center"><p>{ m["msg"] } </p> </div>
-			} else {
-				<div id="" class="border border-yellow-500 bg-yellow-100 px-6 py-3 text-center"><p>{ m["msg"] } </p> </div>
-			}
-		}
-    
-				</div>
-				</div>
+		<div id="messages" hx-swap-oob="true" hx-swap="outerHTML" class="py-4">
+			<div class="mx-auto space-y-3">
+				for _, m := range messages {
+					if m["msg_type"] =="error" {
+						<div id="" class="bg-red-100 px-6 py-3 text-center border border-red-500"><p>{ m["msg"] } </p> </div>
+					} else if m["msg_type"] == "success" {
+						<div id="" class="bg-green-100 border border-green-500 px-6 py-3 text-center"><p>{ m["msg"] } </p> </div>
+					} else {
+						<div id="" class="border border-yellow-500 bg-yellow-100 px-6 py-3 text-center"><p>{ m["msg"] } </p> </div>
+					}
+				}
+			</div>
+		</div>
 	}
 }
-
 
 templ userMenuDropdown() {
 	<div class="relative inline-block text-left">
@@ -112,14 +108,12 @@ templ layout() {
 			@progressIndicator()
 			<div class="bg-gray-50 flex flex-col min-h-screen">
 				@navbar()
-
 				<div id="messages" hx-swap-oob="true" hx-swap="outerHTML">
-
-				<div class="mx-auto">
-				if ctx.Value("msgs") != nil {
-					@RenderMessages(ctx.Value("msgs").([]map[string]string))
-				}
-				</div>
+					<div class="mx-auto">
+						if ctx.Value("msgs") != nil {
+							@RenderMessages(ctx.Value("msgs").([]map[string]string))
+						}
+					</div>
 				</div>
 				<main class="flex-1 ">
 					// new things
@@ -179,4 +173,22 @@ templ footer() {
 			</nav>
 		</div>
 	</footer>
+}
+
+templ NotFoundPage() {
+@layout(){
+
+	<div class="flex flex-col items-center justify-center min-h-screen ">
+		<div class="space-y-4">
+			<h1 class="text-6xl font-bold ">404</h1>
+			<p class="text-xl">Oops! You're Lost in Space!</p>
+			<a
+				class="inline-flex h-10 items-center justify-center rounded-md bg-gray-800 px-8 text-sm font-medium text-gray-50 shadow transition-colors hover:bg-gray-800/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50" 
+				href="/"
+			>
+				Take Me Home
+			</a>
+		</div>
+	</div>
+}
 }

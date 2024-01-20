@@ -56,7 +56,12 @@ func main() {
 
 	// Middlewares
 	router.Use(middleware.Logger)
-	// router.Use(middleware.Recoverer)
+
+	appEnv := os.Getenv("APP_ENV")
+	if appEnv == "" || appEnv != "production" {
+		router.Use(middleware.Recoverer)
+	}
+
 	router.Use(session.SessionManager.LoadAndSave)
 	router.Use(apiCfg.SessionMiddleware)
 
@@ -99,13 +104,14 @@ func main() {
 		ar.Post("/user/change-password", apiCfg.HandlerChangePassword)
 	})
 
+	router.NotFound(apiCfg.HandlerNotFoundPage)
+
 	srv := &http.Server{
 		Addr:    ":" + port,
 		Handler: router,
 	}
 
 	// Fecht posts routne
-	appEnv := os.Getenv("APP_ENV")
 	shouldFetch := true
 	if appEnv == "" || appEnv != "production" {
 		log.Println("Not fetching posts right now !")

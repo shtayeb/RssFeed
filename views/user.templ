@@ -3,13 +3,12 @@ package views
 import "github.com/shtayeb/rssfeed/internal/database"
 
 templ UserInfoCard(user database.User) {
-	<div  
-   
-    hx-swap="outerHTML" 
-    hx-swap-oob="true"
-    id="user-info-card" 
-    class="flex items-center space-x-4 bg-white rounded-lg border shadow-sm p-4"
-  >
+	<div
+		hx-swap="outerHTML"
+		hx-swap-oob="true"
+		id="user-info-card"
+		class="flex items-center space-x-4 bg-white rounded-lg border shadow-sm p-4"
+	>
 		<span class="relative flex shrink-0 overflow-hidden rounded-full h-16 w-16">
 			<span class="flex h-full w-full items-center justify-center rounded-full bg-muted">{ user.Username }</span>
 		</span>
@@ -18,9 +17,9 @@ templ UserInfoCard(user database.User) {
 			<div class="text-sm text-gray-500 ">{ user.Email }</div>
 		</div>
 	</div>
-				if ctx.Value("msgs") != nil {
-					@RenderMessages(ctx.Value("msgs").([]map[string]string))
-				}
+	if ctx.Value("msgs") != nil {
+		@RenderMessages(ctx.Value("msgs").([]map[string]string))
+	}
 }
 
 templ SuccessPartial() {
@@ -53,7 +52,6 @@ templ UserManagement() {
 						</div>
 					</form>
 					<div data-orientation="horizontal" role="none" hx-indicator=".progress" class="shrink-0 h-[1px] w-full my-4"></div>
-
 					<form hx-post="/user/change-password" hx-target="" hx-swap="none" hx-trigger="submit" class="rounded-lg border bg-card text-card-foreground shadow-sm w-full bg-white" data-v0-t="card">
 						<div class="flex flex-col space-y-1.5 p-6">
 							<h3 class="text-2xl font-semibold whitespace-nowrap leading-none tracking-tight">Change Password</h3>

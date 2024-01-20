@@ -16,6 +16,18 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+func hashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	return string(bytes), err
+}
+
+func checkPasswordHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
+}
+
+var rxEmail = regexp.MustCompile(".+@.+\\..+")
+
 type UserRegisterParams struct {
 	Name                 string
 	Username             string
@@ -56,12 +68,12 @@ func (cfg *ApiConfig) HandlerChangePassword(w http.ResponseWriter, r *http.Reque
 	}
 
 	user := ctx.Value("user").(database.User)
-
 	hashedCurrentPassword, _ := hashPassword(currentPassword)
 	log.Printf("current Password:%v ", currentPassword)
 	log.Printf("hashedCurrentPassword: %v ", hashedCurrentPassword)
 	log.Printf("Auth User password: %v ", user.Password)
-	if user.Password != hashedCurrentPassword {
+
+	if checkPasswordHash(currentPassword, user.Password) {
 		// current password is wrong
 		msgs := []map[string]string{
 			{"msg_type": "error", "msg": "Your current password is wrong !"},
@@ -129,18 +141,6 @@ func (cfg *ApiConfig) HandlerLoginView(w http.ResponseWriter, r *http.Request) {
 
 	views.Login().Render(r.Context(), w)
 }
-
-func hashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
-	return string(bytes), err
-}
-
-func checkPasswordHash(password, hash string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-	return err == nil
-}
-
-var rxEmail = regexp.MustCompile(".+@.+\\..+")
 
 func (params *UserRegisterParams) Validate() bool {
 	params.Errors = make(map[string]string)
