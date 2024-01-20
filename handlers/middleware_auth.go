@@ -57,7 +57,8 @@ func (cfg *ApiConfig) SessionMiddleware(next http.Handler) http.Handler {
 			)
 			return
 		}
-		ctx = context.WithValue(r.Context(), "user", user)
+		ctx = context.WithValue(ctx, "user", user)
+		ctx = context.WithValue(ctx, "user_id", user_id)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

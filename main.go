@@ -95,6 +95,7 @@ func main() {
 		ar.Get("/users", apiCfg.HandlerUsersGet)
 		ar.Get("/user/profile", apiCfg.HanlderUserProfile)
 		ar.Post("/user", apiCfg.HandlerProfileUpdate)
+		ar.Get("/user", apiCfg.HandlerGetAuthUser)
 		ar.Post("/user/change-password", apiCfg.HandlerChangePassword)
 	})
 

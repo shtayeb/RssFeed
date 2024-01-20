@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/angelofallars/htmx-go"
 	"github.com/shtayeb/rssfeed/internal/database"
 	"github.com/shtayeb/rssfeed/internal/models"
 	"github.com/shtayeb/rssfeed/internal/session"
@@ -27,7 +28,6 @@ type UserRegisterParams struct {
 func (cfg *ApiConfig) HandlerChangePassword(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	// Get the user from session
-	user := ctx.Value("user").(database.User)
 	// Get compare the hashed passwords
 	r.ParseForm()
 	currentPassword := r.PostFormValue("current_password")
@@ -37,18 +37,37 @@ func (cfg *ApiConfig) HandlerChangePassword(w http.ResponseWriter, r *http.Reque
 	if currentPassword == "" || newPassword == "" || newPasswordConfirmation == "" {
 		// Invalid data
 		// return validation error
+		msgs := []map[string]string{
+			{"msg_type": "error", "msg": "Please fill all of the form !"},
+		}
+		htmx.NewResponse().
+			RenderTempl(r.Context(), w, views.RenderMessages(msgs))
 		return
 	}
-
-	hashedCurrentPassword, _ := hashPassword(currentPassword)
-	if user.Password != hashedCurrentPassword {
-		// current password is wrong
-		return
-	}
-
 	// compare the password and password confirmation
 	if newPassword != newPasswordConfirmation {
 		// Password does not match
+		msgs := []map[string]string{
+			{"msg_type": "error", "msg": "Passwords does not match"},
+		}
+		htmx.NewResponse().
+			RenderTempl(r.Context(), w, views.RenderMessages(msgs))
+		return
+	}
+
+	user := ctx.Value("user").(database.User)
+
+	hashedCurrentPassword, _ := hashPassword(currentPassword)
+	log.Printf("current Password:%v ", currentPassword)
+	log.Printf("hashedCurrentPassword: %v ", hashedCurrentPassword)
+	log.Printf("Auth User password: %v ", user.Password)
+	if user.Password != hashedCurrentPassword {
+		// current password is wrong
+		msgs := []map[string]string{
+			{"msg_type": "error", "msg": "Your current password is wrong !"},
+		}
+		htmx.NewResponse().
+			RenderTempl(r.Context(), w, views.RenderMessages(msgs))
 		return
 	}
 
@@ -56,6 +75,11 @@ func (cfg *ApiConfig) HandlerChangePassword(w http.ResponseWriter, r *http.Reque
 	hashedNewPassword, err := hashPassword(newPassword)
 	if err != nil {
 		// Could not hash the new password
+		msgs := []map[string]string{
+			{"msg_type": "error", "msg": "Invalid new password. Please try something new"},
+		}
+		htmx.NewResponse().
+			RenderTempl(r.Context(), w, views.RenderMessages(msgs))
 		return
 	}
 
@@ -66,6 +90,11 @@ func (cfg *ApiConfig) HandlerChangePassword(w http.ResponseWriter, r *http.Reque
 	)
 	if err != nil {
 		// Could not update the DB, try again
+		msgs := []map[string]string{
+			{"msg_type": "error", "msg": "Something went wrong please try again"},
+		}
+		htmx.NewResponse().
+			RenderTempl(r.Context(), w, views.RenderMessages(msgs))
 		return
 	}
 	// Invalidate the session - logout user
