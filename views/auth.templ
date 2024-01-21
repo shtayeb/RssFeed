@@ -1,19 +1,5 @@
 package views
 
-templ renderMessages(messages []map[string]string) {
-	if len(messages) != 0 {
-		for _, m := range messages {
-			if m["msg_type"] =="error" {
-				<div id="messages" class="bg-red-100 px-5 py-3"><p>{ m["msg"] } </p> </div>
-			} else if m["msg_type"] == "success" {
-				<div id="messages" class="bg-green-100 px-5 py-3"><p>{ m["msg"] } </p> </div>
-			} else {
-				<div id="messages" class="bg-yellow-100 px-5 py-3"><p>{ m["msg"] } </p> </div>
-			}
-		}
-	}
-}
-
 templ Login() {
 	@bareLayout() {
 		<div class="bg-gray-100 min-h-screen flex items-center justify-center">
@@ -33,7 +19,7 @@ templ Login() {
 					</p>
 				</div>
 				if ctx.Value("msgs") != nil {
-					@renderMessages(ctx.Value("msgs").([]map[string]string))
+					@RenderMessages(ctx.Value("msgs").([]map[string]string))
 				}
 				<form class="space-y-4" method="POST" action="/login">
 					<div class="space-y-2">
@@ -113,7 +99,7 @@ templ Register(errors map[string]string) {
 					</p>
 				</div>
 				if ctx.Value("msgs") != nil {
-					@renderMessages(ctx.Value("msgs").([]map[string]string))
+					@RenderMessages(ctx.Value("msgs").([]map[string]string))
 				}
 				<form class="space-y-4" method="POST" action="/register">
 					<div class="space-y-2">

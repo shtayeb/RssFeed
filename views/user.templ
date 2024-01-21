@@ -1,33 +1,46 @@
 package views
 
 import "github.com/shtayeb/rssfeed/internal/database"
-templ SuccessPartial(){
-  <p>
-      This is an htmx success partial
-  </p>
+
+templ UserInfoCard(user database.User) {
+	<div
+		hx-swap="outerHTML"
+		hx-swap-oob="true"
+		id="user-info-card"
+		class="flex items-center space-x-4 bg-white rounded-lg border shadow-sm p-4"
+	>
+		<span class="relative flex shrink-0 overflow-hidden rounded-full h-16 w-16">
+			<span class="flex h-full w-full items-center justify-center rounded-full bg-muted">{ user.Username }</span>
+		</span>
+		<div class="grid gap-1">
+			<div class="text-lg font-medium">{ user.Name }</div>
+			<div class="text-sm text-gray-500 ">{ user.Email }</div>
+		</div>
+	</div>
+	if ctx.Value("msgs") != nil {
+		@RenderMessages(ctx.Value("msgs").([]map[string]string))
+	}
 }
+
+templ SuccessPartial() {
+	<p>
+		This is an htmx success partial
+	</p>
+}
+
 templ UserManagement() {
 	@layout() {
 		<section class="max-w-screen-xl px-4 md:px-6 mx-auto">
 			<div class="flex flex-col items-center justify-center">
 				<div class="w-full p-4 ">
-					<div class="flex items-center space-x-4 bg-white rounded-lg border shadow-sm p-4">
-						<span class="relative flex shrink-0 overflow-hidden rounded-full h-16 w-16">
-							<span class="flex h-full w-full items-center justify-center rounded-full bg-muted">U </span>
-						</span>
-						<div class="grid gap-1">
-							<div class="text-lg font-medium">{ ctx.Value("user").(database.User).Name }</div>
-							<div class="text-sm text-gray-500 ">{ ctx.Value("user").(database.User).Email }</div>
-						</div>
-					</div>
+					@UserInfoCard(ctx.Value("user").(database.User))
 					<div data-orientation="horizontal" role="none" class="shrink-0 h-[1px] w-full my-4"></div>
 					// Edit profile form
-					<form hx-post="/user" hx-trigger="submit" hx-target="#user-post-message" class="rounded-lg border bg-card text-card-foreground shadow-sm w-full bg-white px-6" data-v0-t="card" hx-on::after-request="this.reset()">
+					<form hx-post="/user" hx-trigger="submit" hx-indicator=".progress" hx-swap="afterbegin" hx-target="#user-post-message" class="rounded-lg border bg-card text-card-foreground shadow-sm w-full bg-white p-6" data-v0-t="card" hx-on::after-request="this.reset()">
 						<div class="flex flex-col space-y-1.5 ">
 							<h3 class="text-2xl font-semibold whitespace-nowrap leading-none tracking-tight">Edit Profile</h3>
+							<div id="user-post-message" class=""></div>
 						</div>
-            <div id="user-post-message" class="" >
-            </div>
 						<div class="space-y-4">
 							<div class="space-y-2">
 								<label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" for="current-password">Name</label>
@@ -38,8 +51,8 @@ templ UserManagement() {
 							<button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-black text-white hover:bg-black/90 h-10 px-4 py-2 ml-auto" type="submit">Save</button>
 						</div>
 					</form>
-					<div data-orientation="horizontal" role="none" class="shrink-0 h-[1px] w-full my-4"></div>
-					<form hx-post="/user/change-password" hx-trigger="submit" class="rounded-lg border bg-card text-card-foreground shadow-sm w-full bg-white" data-v0-t="card">
+					<div data-orientation="horizontal" role="none" hx-indicator=".progress" class="shrink-0 h-[1px] w-full my-4"></div>
+					<form hx-post="/user/change-password" hx-target="" hx-swap="none" hx-trigger="submit" class="rounded-lg border bg-card text-card-foreground shadow-sm w-full bg-white" data-v0-t="card">
 						<div class="flex flex-col space-y-1.5 p-6">
 							<h3 class="text-2xl font-semibold whitespace-nowrap leading-none tracking-tight">Change Password</h3>
 						</div>

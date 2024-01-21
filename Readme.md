@@ -1,6 +1,8 @@
 # [RSS FEED AGGREGATOR](https://rssfeed.cyclic.app/)
 An RSS feed aggragtor built with GO.
 
+View the site [Analytics](https://rssfeed.goatcounter.com/)
+
 ## Tech Stack
 - GO
 - Templ
@@ -30,8 +32,9 @@ An RSS feed aggragtor built with GO.
 - Create feed follow CRUD
 - /user/feeds scoped to the user
 - User profile management  
-    - Error handling with htmx
-    - Create a user profile dropdown for auth user
+    - [x] Create a user profile dropdown for auth user
+    - [x] Error handling with htmx
+    - Fix Change password error: No consistent hashing for passwords
 
 - CSRF token protection for the forms
 - Check django requres object for any other userful data to be included in the context
