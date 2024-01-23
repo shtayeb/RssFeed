@@ -157,7 +157,7 @@ func (cfg *ApiConfig) ResetPassword(w http.ResponseWriter, r *http.Request) {
 		}
 
 		ctx = context.WithValue(r.Context(), "msgs", msgs)
-		views.ForgotPassword().Render(ctx, w)
+		views.ResetPassword(token).Render(ctx, w)
 		// send the user to the landing page
 		return
 	}
@@ -171,7 +171,7 @@ func (cfg *ApiConfig) ResetPassword(w http.ResponseWriter, r *http.Request) {
 		}
 
 		ctx = context.WithValue(r.Context(), "msgs", msgs)
-		views.ForgotPassword().Render(ctx, w)
+		views.ResetPassword(token).Render(ctx, w)
 		return
 	}
 
@@ -185,7 +185,7 @@ func (cfg *ApiConfig) ResetPassword(w http.ResponseWriter, r *http.Request) {
 		}
 
 		ctx = context.WithValue(r.Context(), "msgs", msgs)
-		views.ForgotPassword().Render(ctx, w)
+		views.ResetPassword(token).Render(ctx, w)
 		return
 	}
 
@@ -233,9 +233,12 @@ func (cfg *ApiConfig) ForgotPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Printf("email from the form: %v", email)
+
 	// Get the user with the provided email
-	user, err := cfg.DB.GetUserByEmailOrUsername(ctx, email)
+	user, err := cfg.DB.GetUserByEmail(ctx, email)
 	if err != nil {
+		log.Println(err)
 		msgs := []map[string]string{
 			{"msg_type": "error", "msg": "No user with this email found!"},
 		}
@@ -246,9 +249,9 @@ func (cfg *ApiConfig) ForgotPassword(w http.ResponseWriter, r *http.Request) {
 
 	tokenString, err := createToken(user, *cfg)
 	if err != nil {
-		log.Println("could not create jwt token for password reset", err)
+		log.Println("Failed to create token:", err)
 	}
-	log.Println(tokenString)
+	log.Printf("==== ==== token: %v", tokenString)
 
 	// TODO: Email sending logic and configuration here
 	// send the rest link to the user email address

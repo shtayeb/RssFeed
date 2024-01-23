@@ -10,17 +10,19 @@ VALUES (
 )
 RETURNING *;
 
---- name: GetUserByEmail :one
+-- name: UpdateUserName :exec
+UPDATE users SET name = $1 WHERE id = $2;
+
+-- name: ChangeUserPassword :exec
+UPDATE users SET password = $1 WHERE id = $2;
+
+-- name: GetUserByEmail :one
 SELECT * FROM users WHERE email = $1;
 
 -- name: GetUserByAPIKey :one
 SELECT * FROM users WHERE id = $1;
 
 -- name: GetUserByEmailOrUsername :one
-SELECT * FROM users WHERE email=$1 or username=$1;
+SELECT * FROM users WHERE email = $1 or username = $1;
 
--- name: UpdateUserName :exec
-UPDATE users SET name = $1 WHERE id = $2;
 
--- name: ChangeUserPassword :exec
-UPDATE users SET password = $1 WHERE id = $2;
