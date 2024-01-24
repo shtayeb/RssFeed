@@ -52,8 +52,9 @@ func main() {
 	apiCfg := handlers.ApiConfig{
 		DB: dbQueries,
 		Config: handlers.Config{
-			AppKey: APP_KEY,
-			AppEnv: APP_ENV,
+			AppKey:  APP_KEY,
+			AppEnv:  APP_ENV,
+			APP_URL: res["APP_URL"],
 			MailConfig: handlers.MailConfig{
 				MAIL_HOST:         res["MAIL_HOST"],
 				MAIL_PORT:         res["MAIL_PORT"],

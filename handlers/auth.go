@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"regexp"
@@ -255,7 +256,15 @@ func (cfg *ApiConfig) ForgotPassword(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// send the rest link to the user email address
-	ok, err := SendEmail(ctx, emails.ResetPasswordRequestMail(user.Name, tokenString), cfg.Config, mr)
+	ok, err := SendEmail(
+		ctx,
+		emails.ResetPasswordRequestMail(
+			user.Name,
+			fmt.Sprintf("%v/reset-password/%v", cfg.Config.APP_URL, tokenString),
+		),
+		cfg.Config,
+		mr,
+	)
 	if !ok && err != nil {
 		log.Printf("failed to send email: %v", err)
 		msgs := []map[string]string{
@@ -277,7 +286,6 @@ func (cfg *ApiConfig) ForgotPassword(w http.ResponseWriter, r *http.Request) {
 	}
 
 	RenderWithMsg(views.ForgotPassword(), w, ctx, msgs)
-
 }
 
 func (cfg *ApiConfig) ForgotPasswordView(w http.ResponseWriter, r *http.Request) {

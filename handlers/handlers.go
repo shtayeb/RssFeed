@@ -13,8 +13,9 @@ type MailConfig struct {
 }
 
 type Config struct {
-	AppKey string
-	AppEnv string
+	AppKey  string
+	AppEnv  string
+	APP_URL string
 	MailConfig
 }
 

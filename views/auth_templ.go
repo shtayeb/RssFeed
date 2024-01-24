@@ -454,7 +454,7 @@ func Register(errors map[string]string) templ.Component {
 				var templ_7745c5c3_Var37 string
 				templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.JoinStringErrs(errors["Name"])
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views\auth.templ`, Line: 208, Col: 25}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views\auth.templ`, Line: 203, Col: 25}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var37))
 				if templ_7745c5c3_Err != nil {
@@ -478,7 +478,7 @@ func Register(errors map[string]string) templ.Component {
 				var templ_7745c5c3_Var39 string
 				templ_7745c5c3_Var39, templ_7745c5c3_Err = templ.JoinStringErrs(errors["Email"])
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views\auth.templ`, Line: 229, Col: 26}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views\auth.templ`, Line: 224, Col: 26}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var39))
 				if templ_7745c5c3_Err != nil {
@@ -502,7 +502,7 @@ func Register(errors map[string]string) templ.Component {
 				var templ_7745c5c3_Var41 string
 				templ_7745c5c3_Var41, templ_7745c5c3_Err = templ.JoinStringErrs(errors["Username"])
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views\auth.templ`, Line: 250, Col: 29}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views\auth.templ`, Line: 245, Col: 29}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var41))
 				if templ_7745c5c3_Err != nil {
@@ -526,7 +526,7 @@ func Register(errors map[string]string) templ.Component {
 				var templ_7745c5c3_Var43 string
 				templ_7745c5c3_Var43, templ_7745c5c3_Err = templ.JoinStringErrs(errors["Password"])
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views\auth.templ`, Line: 271, Col: 29}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views\auth.templ`, Line: 266, Col: 29}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var43))
 				if templ_7745c5c3_Err != nil {
