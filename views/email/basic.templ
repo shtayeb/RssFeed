@@ -1,0 +1,19 @@
+package emails
+
+import "fmt"
+
+templ ResetPasswordRequestMail(name, token string) {
+	<html>
+		<head>
+			<title>
+				Reset Password
+			</title>
+		</head>
+		<body>
+			<p>
+				Hello { name }
+				<a href={ templ.URL(fmt.Sprintf("/reset-password/%v", token)) }>Confirm email address</a>
+			</p>
+		</body>
+	</html>
+}
