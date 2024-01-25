@@ -31,3 +31,7 @@ JOIN feeds ON feeds.id = posts.feed_id
 WHERE feed_id = $1
 ORDER BY posts.published_at DESC
 LIMIT $2 offset $3;
+
+-- name: GetFeedPostsCount :one
+SELECT COUNT(*) FROM posts WHERE feed_id = $1;
+

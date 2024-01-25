@@ -12,35 +12,24 @@ import (
 	"github.com/a-h/templ"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/shtayeb/rssfeed/internal/database"
+	"github.com/shtayeb/rssfeed/internal/types"
 )
 
-type Pagination struct {
-	PerPage      int
-	CurrentPage  int
-	LastPage     int
-	FirstPageUrl string
-	LastPageUrl  string
-	NextPageUrl  string
-	PrevPageUrl  string
-	Next         int
-	Previous     int
-	TotalPage    int
-	Data         *[]any
-}
-
 // Generated Pagination Meta data
-func paginate[T interface{}](data []T, limit int, page int) Pagination {
-	paginated := Pagination{}
+func paginate(totalData int, limit int, page int) types.Pagination {
+	paginated := types.Pagination{}
+	// get count of the all of the tables data
 
 	// Count all record
-	total := (len(data) / limit)
+	totalPage := (totalData / limit)
+	log.Printf("totalPage = data(%v)/limit(%v): %v", totalData, limit, totalPage)
 
 	// Calculator Total Page
-	remainder := (total % limit)
+	remainder := (totalPage % limit)
 	if remainder == 0 {
-		paginated.TotalPage = total
+		paginated.TotalPage = totalPage
 	} else {
-		paginated.TotalPage = total + 1
+		paginated.TotalPage = totalPage + 1
 	}
 
 	// Set current/record per page meta data
@@ -58,6 +47,12 @@ func paginate[T interface{}](data []T, limit int, page int) Pagination {
 		paginated.Next = 0
 	}
 
+	paginated.FirstPageUrl = fmt.Sprintf("?page=%v", 1)
+	paginated.LastPageUrl = fmt.Sprintf("?page=%v&size=%v", paginated.TotalPage, limit)
+	paginated.NextPageUrl = fmt.Sprintf("?page=%v&size=%v", paginated.Next, limit)
+	paginated.PrevPageUrl = fmt.Sprintf("?page=%v&size=%v", paginated.Previous, limit)
+
+	// log.Printf("==== This is inside the paginate === : %v \n", paginated)
 	return paginated
 }
 
