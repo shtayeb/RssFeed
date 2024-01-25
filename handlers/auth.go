@@ -15,7 +15,7 @@ import (
 	"github.com/shtayeb/rssfeed/internal/models"
 	"github.com/shtayeb/rssfeed/internal/session"
 	"github.com/shtayeb/rssfeed/views"
-	emails "github.com/shtayeb/rssfeed/views/email"
+	"github.com/shtayeb/rssfeed/views/emails"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -147,20 +147,16 @@ func (cfg *ApiConfig) ResetPassword(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	r.ParseForm()
 	token := r.PostFormValue("token")
-	password := r.PostFormValue("password")
-	passwordConfirmation := r.PostFormValue("password_confirmation")
+	password := r.PostFormValue("new_password")
+	passwordConfirmation := r.PostFormValue("new_password_confirmation")
 
 	if token == "" || password == "" || passwordConfirmation == "" {
 		msgs := []map[string]string{
 			{
-				"msg_type": "success",
-				"msg":      "Your password has been reset, you can login with your new password",
+				"msg_type": "error",
+				"msg":      "All fields are necessary!",
 			},
 		}
-
-		// ctx = context.WithValue(r.Context(), "msgs", msgs)
-		// views.ResetPassword(token).Render(ctx, w)
-		// send the user to the landing page
 		RenderWithMsg(views.ResetPassword(token), w, ctx, msgs)
 		return
 	}
@@ -168,7 +164,7 @@ func (cfg *ApiConfig) ResetPassword(w http.ResponseWriter, r *http.Request) {
 	if password != passwordConfirmation {
 		RenderWithMsg(views.ResetPassword(token), w, ctx, []map[string]string{
 			{
-				"msg_type": "success",
+				"msg_type": "error",
 				"msg":      "Password and Password Confirmation does not match!",
 			},
 		})
@@ -179,15 +175,25 @@ func (cfg *ApiConfig) ResetPassword(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		RenderWithMsg(views.ResetPassword(token), w, ctx, []map[string]string{
 			{
-				"msg_type": "success",
-				"msg":      "Password and Password Confirmation does not match!",
+				"msg_type": "error",
+				"msg":      "Something is wrong with your token",
 			},
 		})
 		return
 	}
 
 	// Hash the new password
-	hashedPassword, _ := hashPassword(password)
+	hashedPassword, err := hashPassword(password)
+	if err != nil {
+		log.Printf("failed to hash passwrod: %v", err)
+		RenderWithMsg(views.ResetPassword(token), w, ctx, []map[string]string{
+			{
+				"msg_type": "error",
+				"msg":      "Something went wrong, Please try again",
+			},
+		})
+		return
+	}
 
 	// Update the user in db
 	err = cfg.DB.ChangeUserPassword(

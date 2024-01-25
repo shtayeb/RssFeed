@@ -15,6 +15,17 @@ tailwindcss --input tailwind.css --output test.css --content basic.templ
 ```
 
 ## TODO
+
+### Not Started 
+
+- Pagination for posts list page
+- Email notification for your feed - when new post is added
+
+- Create feed follow/unfollow CRUD
+- user followings feeds page
+- /user/feeds scoped to the user
+
+### Done
 - [x] Use session management package
 - [x] Setup Middleware
 - [x] Setup Middleware group with go-chi for authenticated routes
@@ -30,19 +41,19 @@ tailwindcss --input tailwind.css --output test.css --content basic.templ
 - [x] /posts
 - [x] Create page for post list, 
 - [x] /feed/{feedId}/posts -> make Post templ customizable
-- [x] User profile management  
+- [x] User profile management 
     - [x] Create a user profile dropdown for auth user
     - [x] Error handling with htmx
     - [x] Fix Change password error: No consistent hashing for passwords
 
-- [] auth
-    - Testing reset-password
-    - Verify new users email
 
-- Email notification for your feed - when new post is added
-- feed following pages
-- Create feed follow CRUD
-- /user/feeds scoped to the user
+### Backlog
+
+- [] auth
+    - [x] Testing reset-password 
+        - Create a reset_password table and save the reset requests there. right now users can reset their passwords as much as they want 
+        as long as their token is valid
+    - [] Verify new users email
 
 - CSRF token protection for the forms
 - Check django requres object for any other userful data to be included in the context

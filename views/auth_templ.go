@@ -57,7 +57,7 @@ func ResetPassword(token string) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<form class=\"space-y-4\" method=\"POST\" action=\"/forgot-password\"><input type=\"hidden\" value=\"")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<form class=\"space-y-4\" method=\"POST\" action=\"/reset-password\"><input type=\"hidden\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

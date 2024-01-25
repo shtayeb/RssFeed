@@ -49,7 +49,7 @@ templ userMenuDropdown() {
 		<div id="user-menu-dropdown" class="hidden absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
 			<div class="py-1" role="none">
 				<!-- Active: "bg-gray-100 text-gray-900", Not Active: "text-gray-700" -->
-				<a hx-boost="true" href="/user/profile" class="text-gray-700 block w-full px-4 py-2 text-left text-sm">Profile</a>
+				<a href="/user/profile" class="text-gray-700 block w-full px-4 py-2 text-left text-sm">Profile</a>
 				<form method="POST" action="/logout">
 					<button
 						type="submit"
@@ -133,10 +133,10 @@ templ navbar() {
 				<h1 class="text-2xl font-bold">TECH FEED</h1>
 			</a>
 			<nav class="ml-auto flex gap-4 items-center sm:gap-6">
-				<a hx-boost="true" class="text-sm font-medium hover:underline underline-offset-4" href="/posts">
+				<a  class="text-sm font-medium hover:underline underline-offset-4" href="/posts">
 					Posts	
 				</a>
-				<a hx-boost="true" class="text-sm font-medium hover:underline underline-offset-4" href="/feeds">
+				<a  class="text-sm font-medium hover:underline underline-offset-4" href="/feeds">
 					Feed
 				</a>
 				<button id="invmode" class="cont-inv text-sm font-medium hover:underline underline-offset-4" tabindex="2">Dark Mode</button>
@@ -145,10 +145,10 @@ templ navbar() {
 					@userMenuDropdown()
 					// User Dropdown End
 				} else {
-					<a class="text-sm font-medium hover:underline underline-offset-4" hx-boost="true" href="/register">
+					<a class="text-sm font-medium hover:underline underline-offset-4"  href="/register">
 						Register
 					</a>
-					<a class="text-sm font-medium hover:underline underline-offset-4" href="/login" hx-boost="true">
+					<a class="text-sm font-medium hover:underline underline-offset-4" href="/login" >
 						Login
 					</a>
 				}

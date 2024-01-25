@@ -11,7 +11,7 @@ templ ResetPassword(token string) {
 				if ctx.Value("msgs") != nil {
 					@RenderMessages(ctx.Value("msgs").([]map[string]string))
 				}
-				<form class="space-y-4" method="POST" action="/forgot-password">
+				<form class="space-y-4" method="POST" action="/reset-password">
 					<input type="hidden" value={ token } name="token"/>
 					<div class="p-6 space-y-4">
 						<div class="space-y-2">
