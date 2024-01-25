@@ -27,11 +27,18 @@ func (cfg *ApiConfig) HandlerFeedPosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	posts, err := cfg.DB.GetFeedPosts(r.Context(), int32(feedId))
+	posts, err := cfg.DB.GetFeedPosts(r.Context(), database.GetFeedPostsParams{
+		FeedID: int32(feedId),
+		Limit:  9,
+		Offset: 9,
+	})
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Couldn't get feed")
 		return
 	}
+
+	pagination := paginate(posts, 10, 1)
+	log.Printf("\n pagination ============ %v ==============\n", pagination)
 
 	views.FeedPosts(feed, models.DatabaseFeedPostToPostForUserRows(posts)).Render(r.Context(), w)
 }

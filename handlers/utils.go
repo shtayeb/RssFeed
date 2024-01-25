@@ -14,13 +14,70 @@ import (
 	"github.com/shtayeb/rssfeed/internal/database"
 )
 
+type Pagination struct {
+	PerPage      int
+	CurrentPage  int
+	LastPage     int
+	FirstPageUrl string
+	LastPageUrl  string
+	NextPageUrl  string
+	PrevPageUrl  string
+	Next         int
+	Previous     int
+	TotalPage    int
+	Data         *[]any
+}
+
+// Generated Pagination Meta data
+func paginate[T interface{}](data []T, limit int, page int) Pagination {
+	paginated := Pagination{}
+
+	// Count all record
+	total := (len(data) / limit)
+
+	// Calculator Total Page
+	remainder := (total % limit)
+	if remainder == 0 {
+		paginated.TotalPage = total
+	} else {
+		paginated.TotalPage = total + 1
+	}
+
+	// Set current/record per page meta data
+	paginated.CurrentPage = page
+	paginated.PerPage = limit
+
+	// Calculator the Next/Previous Page
+	if page <= 0 {
+		paginated.Next = page + 1
+	} else if page < paginated.TotalPage {
+		paginated.Previous = page - 1
+		paginated.Next = page + 1
+	} else if page == paginated.TotalPage {
+		paginated.Previous = page - 1
+		paginated.Next = 0
+	}
+
+	return paginated
+}
+
 type MailRequest struct {
 	to      []string
 	subject string
 }
 
-func SendEmail(c context.Context, comp templ.Component, appConfig Config, r MailRequest) (bool, error) {
-	auth := smtp.PlainAuth("", appConfig.MAIL_USERNAME, appConfig.MAIL_PASSWORD, appConfig.MAIL_HOST)
+func SendEmail(
+	c context.Context,
+	comp templ.Component,
+	appConfig Config,
+	r MailRequest,
+) (bool, error) {
+	auth := smtp.PlainAuth(
+		"",
+		appConfig.MAIL_USERNAME,
+		appConfig.MAIL_PASSWORD,
+		appConfig.MAIL_HOST,
+	)
 
 	// parse template and set it to r.Body
 	var mailBody bytes.Buffer
