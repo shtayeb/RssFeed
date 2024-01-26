@@ -20,10 +20,6 @@ import (
 
 func main() {
 	godotenv.Load(".env")
-	res, err := godotenv.Read(".env")
-	if err != nil {
-		log.Fatal("Invalid .env file", err)
-	}
 
 	APP_KEY := os.Getenv("APP_KEY")
 	if APP_KEY == "" {
@@ -54,15 +50,15 @@ func main() {
 		Config: handlers.Config{
 			AppKey:  APP_KEY,
 			AppEnv:  APP_ENV,
-			APP_URL: res["APP_URL"],
+			APP_URL: os.Getenv("APP_URL"),
 			MailConfig: handlers.MailConfig{
-				MAIL_HOST:         res["MAIL_HOST"],
-				MAIL_PORT:         res["MAIL_PORT"],
-				MAIL_USERNAME:     res["MAIL_USERNAME"],
-				MAIL_PASSWORD:     res["MAIL_PASSWORD"],
-				MAIL_FROM_ADDRESS: res["MAIL_FROM_ADDRESS"],
-				MAIL_FROM_NAME:    res["MAIL_FROM_NAME"],
-				MAIL_ENCRYPTION:   res["MAIL_ENCRYPTION"],
+				MAIL_HOST:         os.Getenv("MAIL_HOST"),
+				MAIL_PORT:         os.Getenv("MAIL_PORT"),
+				MAIL_USERNAME:     os.Getenv("MAIL_USERNAME"),
+				MAIL_PASSWORD:     os.Getenv("MAIL_PASSWORD"),
+				MAIL_FROM_ADDRESS: os.Getenv("MAIL_FROM_ADDRESS"),
+				MAIL_FROM_NAME:    os.Getenv("MAIL_FROM_NAME"),
+				MAIL_ENCRYPTION:   os.Getenv("MAIL_ENCRYPTION"),
 			},
 		},
 	}
