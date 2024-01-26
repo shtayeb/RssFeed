@@ -1,7 +1,8 @@
 module github.com/shtayeb/rssfeed
 
-go 1.21
+go 1.21.4
 
+toolchain go1.21.6
 
 require github.com/joho/godotenv v1.5.1
 
