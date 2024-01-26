@@ -18,14 +18,13 @@ tailwindcss --input tailwind.css --output test.css --content basic.templ
 
 ### Not Started 
 
-- Pagination for posts list page
-- Email notification for your feed - when new post is added
-
 - Create feed follow/unfollow CRUD
-- user followings feeds page
+- Email notification for your feed - when new post is added
+- User followings feeds page
 - /user/feeds scoped to the user
 
 ### Done
+- [x] Pagination for posts list page
 - [x] Use session management package
 - [x] Setup Middleware
 - [x] Setup Middleware group with go-chi for authenticated routes

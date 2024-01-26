@@ -1,7 +1,8 @@
 package views
 
 import "github.com/shtayeb/rssfeed/internal/database"
-import	"github.com/shtayeb/rssfeed/internal/types"
+import "fmt"
+import "github.com/shtayeb/rssfeed/internal/types"
 
 templ postCard(post database.GetPostsForUserRow) {
 	<div class="border bg-white border-gray-200 shadow-sm rounded-lg p-4">
@@ -12,7 +13,29 @@ templ postCard(post database.GetPostsForUserRow) {
 		<a href={ templ.URL(post.FeedUrl) }>
 			<p class="text-sm text-gray-500 mb-2">{ post.FeedName }</p>
 		</a>
-//		<p class="text-gray-700">{ post.Description.String }</p>
+		//		<p class="text-gray-700">{ post.Description.String }</p>
+	</div>
+}
+
+templ Pagination(pagination types.Pagination) {
+	<div class="flex justify-center mt-8 space-x-4">
+		<a href={ templ.URL(pagination.PrevPageUrl) } class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
+			Previous
+		</a>
+		<div class="flex space-x-2">
+			<a href={ templ.URL(pagination.FirstPageUrl) } class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2">
+				1	
+			</a>
+			<button class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
+				{ fmt.Sprintf("Page %v of %v",pagination.CurrentPage,pagination.TotalPage) }
+			</button>
+			<a href={ templ.URL(pagination.LastPageUrl) } class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
+				{ fmt.Sprintf("%v",pagination.LastPage) }
+			</a>
+		</div>
+		<a href={ templ.URL(pagination.NextPageUrl) } class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
+			Next
+		</a>
 	</div>
 }
 
@@ -26,30 +49,8 @@ templ FeedPosts(feed database.Feed,posts []database.GetPostsForUserRow,paginatio
 						@postCard(post)
 					}
 				</div>
-        // Pagination
-
-				<div class="flex justify-center mt-8 space-x-4">
-					<a href={ templ.URL(pagination.PrevPageUrl) } class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
-						Previous
-					</a>
-					<div class="flex space-x-2">
-						<button class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2">
-							1
-						</button>
-						<button class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
-							2
-						</button>
-						<button class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
-							3
-						</button>
-						<button class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
-							4
-						</button>
-					</div>
-					<a href={ templ.URL(pagination.NextPageUrl) }  class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
-						Next
-					</a>
-				</div>
+				// Pagination
+				@Pagination(pagination)
 			</div>
 		</section>
 	}
@@ -65,28 +66,7 @@ templ Posts(posts []database.GetPostsForUserRow) {
 						@postCard(post)
 					}
 				</div>
-				<div class="flex justify-center mt-8 space-x-4">
-					<button class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
-						Previous
-					</button>
-					<div class="flex space-x-2">
-						<button class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2">
-							1
-						</button>
-						<button class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
-							2
-						</button>
-						<button class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
-							3
-						</button>
-						<button class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
-							4
-						</button>
-					</div>
-					<button class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
-						Next
-					</button>
-				</div>
+				// @Pagination(pagination)
 			</div>
 		</section>
 	}
