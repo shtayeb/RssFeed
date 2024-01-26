@@ -21,19 +21,39 @@ func (cfg *ApiConfig) HandlerFeedPosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	limit, err := strconv.Atoi(r.URL.Query().Get("size"))
+	if err != nil {
+		println("err is nil ")
+		limit = 9
+	}
+	page, err := strconv.Atoi(r.URL.Query().Get("page"))
+	if err != nil || page <= 0 {
+		page = 1
+	}
+
 	feed, err := cfg.DB.GetFeed(r.Context(), int32(feedId))
 	if err != nil {
+		log.Printf("Here is why: %v", err)
 		respondWithError(w, http.StatusInternalServerError, "Couldn't get feed")
 		return
 	}
 
-	posts, err := cfg.DB.GetFeedPosts(r.Context(), int32(feedId))
+	posts, err := cfg.DB.GetFeedPosts(r.Context(), database.GetFeedPostsParams{
+		FeedID: int32(feedId),
+		Limit:  int32(limit),
+		Offset: int32(limit * (page - 1)),
+	})
 	if err != nil {
+		log.Printf("Here is why: %v", err)
 		respondWithError(w, http.StatusInternalServerError, "Couldn't get feed")
 		return
 	}
 
-	views.FeedPosts(feed, models.DatabaseFeedPostToPostForUserRows(posts)).Render(r.Context(), w)
+	totalRecordInDB, _ := cfg.DB.GetFeedPostsCount(r.Context(), feed.ID)
+	pagination := paginate(int(totalRecordInDB), limit, page)
+
+	views.FeedPosts(feed, models.DatabaseFeedPostToPostForUserRows(posts), pagination).
+		Render(r.Context(), w)
 }
 
 func (cfg *ApiConfig) HandlerFeedDelete(w http.ResponseWriter, r *http.Request) {
@@ -119,7 +139,7 @@ func (cfg *ApiConfig) HandlerFeedStore(w http.ResponseWriter, r *http.Request) {
 		UserID:    user.ID,
 	})
 	if err != nil {
-		log.Printf("Failed to create feed", err)
+		log.Printf("Failed to create feed: %v", err)
 		respondWithError(w, http.StatusInternalServerError, "Couldn't create feed")
 		return
 	}

@@ -20,25 +20,51 @@ import (
 
 func main() {
 	godotenv.Load(".env")
+	res, err := godotenv.Read(".env")
+	if err != nil {
+		log.Fatal("Invalid .env file", err)
+	}
 
-	port := os.Getenv("PORT")
-	if port == "" {
+	APP_KEY := os.Getenv("APP_KEY")
+	if APP_KEY == "" {
+		log.Fatal("App key is not set. Please create an application key !")
+	}
+
+	PORT := os.Getenv("PORT")
+	if PORT == "" {
 		log.Fatal("PORT environment variable is not set")
 	}
 
-	dbURL := os.Getenv("DATABASE_URL")
-	if dbURL == "" {
+	DB_URL := os.Getenv("DATABASE_URL")
+	if DB_URL == "" {
 		log.Fatal("DATABASE_URL environment variable is not set")
 	}
 
-	db, err := sql.Open("postgres", dbURL)
+	APP_ENV := os.Getenv("APP_ENV")
+
+	db, err := sql.Open("postgres", DB_URL)
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	dbQueries := database.New(db)
 
 	apiCfg := handlers.ApiConfig{
 		DB: dbQueries,
+		Config: handlers.Config{
+			AppKey:  APP_KEY,
+			AppEnv:  APP_ENV,
+			APP_URL: res["APP_URL"],
+			MailConfig: handlers.MailConfig{
+				MAIL_HOST:         res["MAIL_HOST"],
+				MAIL_PORT:         res["MAIL_PORT"],
+				MAIL_USERNAME:     res["MAIL_USERNAME"],
+				MAIL_PASSWORD:     res["MAIL_PASSWORD"],
+				MAIL_FROM_ADDRESS: res["MAIL_FROM_ADDRESS"],
+				MAIL_FROM_NAME:    res["MAIL_FROM_NAME"],
+				MAIL_ENCRYPTION:   res["MAIL_ENCRYPTION"],
+			},
+		},
 	}
 
 	// Sesison Manager
@@ -57,8 +83,7 @@ func main() {
 	// Middlewares
 	router.Use(middleware.Logger)
 
-	appEnv := os.Getenv("APP_ENV")
-	if appEnv == "" || appEnv != "production" {
+	if APP_ENV == "" || APP_ENV != "production" {
 		router.Use(middleware.Recoverer)
 	}
 
@@ -74,6 +99,11 @@ func main() {
 		r.Get("/", apiCfg.HandlerLandingPage)
 		r.Get("/login", apiCfg.HandlerLoginView)
 		r.Post("/login", apiCfg.HandlerLogin)
+		r.Get("/forgot-password", apiCfg.ForgotPasswordView)
+		r.Post("/forgot-password", apiCfg.ForgotPassword)
+
+		r.Post("/reset-password", apiCfg.ResetPassword)
+		r.Get("/reset-password/{token}", apiCfg.ResetPasswordView)
 
 		r.Get("/register", apiCfg.HandlerRegisterView)
 		r.Post("/register", apiCfg.HandlerUsersCreate)
@@ -107,13 +137,13 @@ func main() {
 	router.NotFound(apiCfg.HandlerNotFoundPage)
 
 	srv := &http.Server{
-		Addr:    ":" + port,
+		Addr:    ":" + PORT,
 		Handler: router,
 	}
 
 	// Fecht posts routne
 	shouldFetch := true
-	if appEnv == "" || appEnv != "production" {
+	if APP_ENV == "" || APP_ENV != "production" {
 		log.Println("Not fetching posts right now !")
 		shouldFetch = false
 	}
@@ -124,6 +154,6 @@ func main() {
 		go startScraping(dbQueries, collectionConcurrency, collectionInterval)
 	}
 
-	log.Printf("Serving on port: %s\n", port)
+	log.Printf("Serving on port: %s\n", PORT)
 	log.Fatal(srv.ListenAndServe())
 }

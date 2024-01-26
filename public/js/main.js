@@ -31,10 +31,15 @@ document.getElementsByTagName("html")[0].classList.toggle("inverted");
 
 }
 
-document.querySelector("#user-menu-dropdown-btn").addEventListener("click",()=>{
+
+const userMenuDropdown = document.querySelector("#user-menu-dropdown-btn")
+if(userMenuDropdown){
+
+userMenuDropdown.addEventListener("click",()=>{
   console.log("dropdown clicked")
   document.querySelector("#user-menu-dropdown").classList.toggle('hidden')
 })
 
+}
 
 

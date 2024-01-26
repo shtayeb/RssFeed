@@ -85,7 +85,14 @@ FROM posts
 JOIN feeds ON feeds.id = posts.feed_id
 WHERE feed_id = $1
 ORDER BY posts.published_at DESC
+LIMIT $2 offset $3
 `
+
+type GetFeedPostsParams struct {
+	FeedID int32
+	Limit  int32
+	Offset int32
+}
 
 type GetFeedPostsRow struct {
 	ID          int32
@@ -100,8 +107,8 @@ type GetFeedPostsRow struct {
 	FeedUrl     string
 }
 
-func (q *Queries) GetFeedPosts(ctx context.Context, feedID int32) ([]GetFeedPostsRow, error) {
-	rows, err := q.db.QueryContext(ctx, getFeedPosts, feedID)
+func (q *Queries) GetFeedPosts(ctx context.Context, arg GetFeedPostsParams) ([]GetFeedPostsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getFeedPosts, arg.FeedID, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -132,6 +139,17 @@ func (q *Queries) GetFeedPosts(ctx context.Context, feedID int32) ([]GetFeedPost
 		return nil, err
 	}
 	return items, nil
+}
+
+const getFeedPostsCount = `-- name: GetFeedPostsCount :one
+SELECT COUNT(*) FROM posts WHERE feed_id = $1
+`
+
+func (q *Queries) GetFeedPostsCount(ctx context.Context, feedID int32) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getFeedPostsCount, feedID)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
 }
 
 const getFeeds = `-- name: GetFeeds :many

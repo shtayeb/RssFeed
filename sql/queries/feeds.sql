@@ -29,4 +29,9 @@ SELECT posts.*, feeds.name as feed_name,feeds.url as feed_url
 FROM posts 
 JOIN feeds ON feeds.id = posts.feed_id
 WHERE feed_id = $1
-ORDER BY posts.published_at DESC;
+ORDER BY posts.published_at DESC
+LIMIT $2 offset $3;
+
+-- name: GetFeedPostsCount :one
+SELECT COUNT(*) FROM posts WHERE feed_id = $1;
+

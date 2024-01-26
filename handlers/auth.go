@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"regexp"
@@ -9,10 +10,12 @@ import (
 	"time"
 
 	"github.com/angelofallars/htmx-go"
+	"github.com/go-chi/chi/v5"
 	"github.com/shtayeb/rssfeed/internal/database"
 	"github.com/shtayeb/rssfeed/internal/models"
 	"github.com/shtayeb/rssfeed/internal/session"
 	"github.com/shtayeb/rssfeed/views"
+	"github.com/shtayeb/rssfeed/views/emails"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -118,6 +121,181 @@ func (cfg *ApiConfig) HandlerChangePassword(w http.ResponseWriter, r *http.Reque
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
 	return
 	// return something for htmx
+}
+
+func (cfg *ApiConfig) ResetPasswordView(w http.ResponseWriter, r *http.Request) {
+	// REST: /reset-password/{token}
+	token := chi.URLParam(r, "token")
+	// verify the token
+	if token == "" {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+
+	_, err := verifyToken(token, *cfg)
+	if err != nil {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		log.Println("Failed to parse the token", err)
+		return
+	}
+
+	views.ResetPassword(token).Render(r.Context(), w)
+}
+
+func (cfg *ApiConfig) ResetPassword(w http.ResponseWriter, r *http.Request) {
+	// REST: /reset-password
+	ctx := r.Context()
+	r.ParseForm()
+	token := r.PostFormValue("token")
+	password := r.PostFormValue("new_password")
+	passwordConfirmation := r.PostFormValue("new_password_confirmation")
+
+	if token == "" || password == "" || passwordConfirmation == "" {
+		msgs := []map[string]string{
+			{
+				"msg_type": "error",
+				"msg":      "All fields are necessary!",
+			},
+		}
+		RenderWithMsg(views.ResetPassword(token), w, ctx, msgs)
+		return
+	}
+
+	if password != passwordConfirmation {
+		RenderWithMsg(views.ResetPassword(token), w, ctx, []map[string]string{
+			{
+				"msg_type": "error",
+				"msg":      "Password and Password Confirmation does not match!",
+			},
+		})
+		return
+	}
+
+	jwtUserInfo, err := verifyToken(token, *cfg)
+	if err != nil {
+		RenderWithMsg(views.ResetPassword(token), w, ctx, []map[string]string{
+			{
+				"msg_type": "error",
+				"msg":      "Something is wrong with your token",
+			},
+		})
+		return
+	}
+
+	// Hash the new password
+	hashedPassword, err := hashPassword(password)
+	if err != nil {
+		log.Printf("failed to hash passwrod: %v", err)
+		RenderWithMsg(views.ResetPassword(token), w, ctx, []map[string]string{
+			{
+				"msg_type": "error",
+				"msg":      "Something went wrong, Please try again",
+			},
+		})
+		return
+	}
+
+	// Update the user in db
+	err = cfg.DB.ChangeUserPassword(
+		ctx,
+		database.ChangeUserPasswordParams{Password: hashedPassword, ID: jwtUserInfo.user_id},
+	)
+
+	if err != nil {
+		log.Println("Something went wrong,Please try again", err)
+		return
+	}
+
+	// send the user to the login page
+	ctx = context.WithValue(r.Context(), "msgs", []map[string]string{
+		{
+			"msg_type": "success",
+			"msg":      "Your password has been reset, you can login with your new password",
+		},
+	})
+
+	http.Redirect(w, r.WithContext(ctx), "/login", http.StatusSeeOther)
+}
+
+func (cfg *ApiConfig) ForgotPassword(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	err := r.ParseForm()
+	if err != nil {
+		log.Println("Failed to parse form", err)
+	}
+
+	email := r.PostFormValue("email")
+	if email == "" {
+		msgs := []map[string]string{
+			{"msg_type": "error", "msg": "Invalid Email"},
+		}
+		ctx := context.WithValue(r.Context(), "msgs", msgs)
+		views.ForgotPassword().Render(ctx, w)
+		return
+	}
+
+	log.Printf("email from the form: %v", email)
+
+	// Get the user with the provided email
+	user, err := cfg.DB.GetUserByEmail(ctx, email)
+	if err != nil {
+		log.Println(err)
+		msgs := []map[string]string{
+			{"msg_type": "error", "msg": "No user with this email found!"},
+		}
+		ctx := context.WithValue(r.Context(), "msgs", msgs)
+		views.ForgotPassword().Render(ctx, w)
+		return
+	}
+
+	tokenString, err := createToken(user, *cfg)
+	if err != nil {
+		log.Println("Failed to create token:", err)
+	}
+	log.Printf("==== ==== token: %v", tokenString)
+
+	// TODO: Email sending logic and configuration here
+	mr := MailRequest{
+		to:      []string{user.Email},
+		subject: "RSS Feed: Reset Password Link",
+	}
+
+	// send the rest link to the user email address
+	ok, err := SendEmail(
+		ctx,
+		emails.ResetPasswordRequestMail(
+			user.Name,
+			fmt.Sprintf("%v/reset-password/%v", cfg.Config.APP_URL, tokenString),
+		),
+		cfg.Config,
+		mr,
+	)
+	if !ok && err != nil {
+		log.Printf("failed to send email: %v", err)
+		msgs := []map[string]string{
+			{
+				"msg_type": "error",
+				"msg":      "Could not send email, Please try again!",
+			},
+		}
+
+		RenderWithMsg(views.ForgotPassword(), w, ctx, msgs)
+		return
+	}
+
+	msgs := []map[string]string{
+		{
+			"msg_type": "success",
+			"msg":      "Password reset link has been sent to your email address.",
+		},
+	}
+
+	RenderWithMsg(views.ForgotPassword(), w, ctx, msgs)
+}
+
+func (cfg *ApiConfig) ForgotPasswordView(w http.ResponseWriter, r *http.Request) {
+	views.ForgotPassword().Render(r.Context(), w)
 }
 
 func (cfg *ApiConfig) HandlerRegisterView(w http.ResponseWriter, r *http.Request) {
