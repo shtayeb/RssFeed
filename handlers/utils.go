@@ -15,23 +15,25 @@ import (
 	"github.com/shtayeb/rssfeed/internal/types"
 )
 
-// Generated Pagination Meta data
 func paginate(totalData int, limit int, page int) types.Pagination {
 	paginated := types.Pagination{}
 	// get count of the all of the tables data
 
 	// Count all record
 	totalPage := (totalData / limit)
-	log.Printf("totalPage = data(%v)/limit(%v): %v", totalData, limit, totalPage)
+	// log.Printf("totalPage = data(%v)/limit(%v): %v", totalData, limit, totalPage)
 
 	// Calculator Total Page
-	remainder := (totalPage % limit)
+	remainder := (totalData % limit)
+	log.Printf("Remainder totalData limit = %v", remainder)
+
 	if remainder == 0 {
 		paginated.TotalPage = totalPage
 	} else {
 		paginated.TotalPage = totalPage + 1
 	}
 
+	// log.Printf("======== Pagination.TotalPage : %v  ========= ", paginated.TotalPage)
 	// Set current/record per page meta data
 	paginated.CurrentPage = page
 	paginated.PerPage = limit
@@ -44,10 +46,10 @@ func paginate(totalData int, limit int, page int) types.Pagination {
 		paginated.Next = page + 1
 	} else if page == paginated.TotalPage {
 		paginated.Previous = page - 1
-		paginated.Next = 0
+		paginated.Next = 1
 	}
 
-	paginated.FirstPageUrl = fmt.Sprintf("?page=%v", 1)
+	paginated.FirstPageUrl = fmt.Sprintf("?page=%v&size=%v", 1, limit)
 	paginated.LastPageUrl = fmt.Sprintf("?page=%v&size=%v", paginated.TotalPage, limit)
 	paginated.NextPageUrl = fmt.Sprintf("?page=%v&size=%v", paginated.Next, limit)
 	paginated.PrevPageUrl = fmt.Sprintf("?page=%v&size=%v", paginated.Previous, limit)
@@ -158,3 +160,36 @@ func verifyToken(tokenString string, cfg ApiConfig) (JwtUserInfo, error) {
 
 	return JwtUserInfo{}, fmt.Errorf("invalid token")
 }
+
+// // some generic typing here
+// func paginatePlus(
+// 	getData func(context.Context, any) ([]string, error),
+// 	r http.Request,
+// ) types.Pagination {
+// 	// More generic and full fucntion paginate
+// 	paginated := types.Pagination{}
+// 	limit, err := strconv.Atoi(r.URL.Query().Get("size"))
+// 	if err != nil {
+// 		limit = 9
+// 	}
+// 	page, err := strconv.Atoi(r.URL.Query().Get("page"))
+// 	if err != nil || page <= 0 {
+// 		page = 1
+// 	}
+//
+// 	// Get the data
+// 	params := "test"
+// 	// params := {
+// 	// 	FeedID: int32(feedId),
+// 	// 	Limit:  int32(limit),
+// 	// 	Offset: int32(limit * (page - 1)),
+// 	// }
+// 	log.Println(limit)
+// 	data, err := getData(r.Context(), params)
+// 	if err != nil {
+// 		log.Println(data)
+// 		log.Println(err)
+// 	}
+//
+// 	return paginated
+// }

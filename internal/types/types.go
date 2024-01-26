@@ -3,7 +3,6 @@ package types
 type Pagination struct {
 	PerPage      int
 	CurrentPage  int
-	LastPage     int
 	FirstPageUrl string
 	LastPageUrl  string
 	NextPageUrl  string

@@ -22,18 +22,18 @@ func (cfg *ApiConfig) HandlerFeedPosts(w http.ResponseWriter, r *http.Request) {
 	}
 
 	limit, err := strconv.Atoi(r.URL.Query().Get("size"))
-	println(limit)
 	if err != nil {
 		println("err is nil ")
 		limit = 9
 	}
 	page, err := strconv.Atoi(r.URL.Query().Get("page"))
-	if err != nil {
+	if err != nil || page <= 0 {
 		page = 1
 	}
 
 	feed, err := cfg.DB.GetFeed(r.Context(), int32(feedId))
 	if err != nil {
+		log.Printf("Here is why: %v", err)
 		respondWithError(w, http.StatusInternalServerError, "Couldn't get feed")
 		return
 	}
@@ -41,9 +41,10 @@ func (cfg *ApiConfig) HandlerFeedPosts(w http.ResponseWriter, r *http.Request) {
 	posts, err := cfg.DB.GetFeedPosts(r.Context(), database.GetFeedPostsParams{
 		FeedID: int32(feedId),
 		Limit:  int32(limit),
-		Offset: int32(limit * page),
+		Offset: int32(limit * (page - 1)),
 	})
 	if err != nil {
+		log.Printf("Here is why: %v", err)
 		respondWithError(w, http.StatusInternalServerError, "Couldn't get feed")
 		return
 	}
