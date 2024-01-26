@@ -17,11 +17,13 @@ tailwindcss --input tailwind.css --output test.css --content basic.templ
 ## TODO
 
 ### Not Started 
-
-- Create feed follow/unfollow CRUD
-- Email notification for your feed - when new post is added
-- User followings feeds page
-- /user/feeds scoped to the user
+- [] Create feed follow/unfollow CRUD
+- [] Create a new post card
+- [] Make the post scrapping more generic to cover more xml formats
+- [] Email notification for your feed - when new post is added
+- [] User followings feeds page
+- [] /user/feeds scoped to the user
+- [] Verify new users email
 
 ### Done
 - [x] Pagination for posts list page
@@ -52,7 +54,6 @@ tailwindcss --input tailwind.css --output test.css --content basic.templ
     - [x] Testing reset-password 
         - Create a reset_password table and save the reset requests there. right now users can reset their passwords as much as they want 
         as long as their token is valid
-    - [] Verify new users email
 
 - CSRF token protection for the forms
 - Check django requres object for any other userful data to be included in the context
