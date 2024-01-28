@@ -60,24 +60,38 @@ func (q *Queries) DeleteFeedFollow(ctx context.Context, arg DeleteFeedFollowPara
 }
 
 const getFeedFollowsForUser = `-- name: GetFeedFollowsForUser :many
-SELECT id, created_at, updated_at, user_id, feed_id FROM feed_follows WHERE user_id = $1
+SELECT feed_follows.id, feed_follows.created_at, feed_follows.updated_at, feed_follows.user_id, feed_follows.feed_id,feeds.name,feeds.url FROM feed_follows
+JOIN feeds on feed_follows.feed_id = feeds.id
+WHERE feed_follows.user_id = $1
 `
 
-func (q *Queries) GetFeedFollowsForUser(ctx context.Context, userID int32) ([]FeedFollow, error) {
+type GetFeedFollowsForUserRow struct {
+	ID        int32
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	UserID    int32
+	FeedID    int32
+	Name      string
+	Url       string
+}
+
+func (q *Queries) GetFeedFollowsForUser(ctx context.Context, userID int32) ([]GetFeedFollowsForUserRow, error) {
 	rows, err := q.db.QueryContext(ctx, getFeedFollowsForUser, userID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []FeedFollow
+	var items []GetFeedFollowsForUserRow
 	for rows.Next() {
-		var i FeedFollow
+		var i GetFeedFollowsForUserRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.UserID,
 			&i.FeedID,
+			&i.Name,
+			&i.Url,
 		); err != nil {
 			return nil, err
 		}

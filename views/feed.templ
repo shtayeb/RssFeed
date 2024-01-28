@@ -3,10 +3,10 @@ package views
 import "github.com/shtayeb/rssfeed/internal/database"
 import "fmt"
 
-templ FeedLi(feed database.Feed) {
-	<tr id={ fmt.Sprintf("feed-%v", feed.ID) } class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-		<td class="p-4 align-middle ">{ feed.Name }</td>
-		<td class="p-4 align-middle ">{ feed.Url }</td>
+templ FeedLi(feedFollow database.GetFeedFollowsForUserRow) {
+	<tr id={ fmt.Sprintf("feed-%v", feedFollow.ID) } class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+		<td class="p-4 align-middle ">{ feedFollow.Name }</td>
+		<td class="p-4 align-middle ">{ feedFollow.Url }</td>
 		<td class="p-4 flex items-center gap-3 ">
 			<form
 				method="delete"
@@ -32,13 +32,13 @@ templ FeedLi(feed database.Feed) {
 						<path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
 						<path d="m15 5 4 4"></path>
 					</svg>
-					<span class="sr-only">Edit</span>
+					<span class="sr-only">Follow/Unfollow</span>
 				</button>
 			</form>
 			<form
-				hx-delete={ fmt.Sprintf("/feeds/%v", feed.ID) }
+				hx-delete={ fmt.Sprintf("/feeds/%v", feedFollow.ID) }
 				hx-ext="disable-element"
-				hx-target={ fmt.Sprintf("#feed-%v", feed.ID) }
+				hx-target={ fmt.Sprintf("#feed-%v", feedFollow.ID) }
 				hx-disable-element="this"
 				hx-confirm="Are you sure?"
 				hx-indicator=".progress"
@@ -68,7 +68,7 @@ templ FeedLi(feed database.Feed) {
 	</tr>
 }
 
-templ Feeds(feeds []database.Feed) {
+templ Feeds(feeds []database.GetFeedFollowsForUserRow) {
 	@layout() {
 		<div class="grid grid-cols-1 lg:grid-cols-1 gap-6 py-6 max-w-screen-xl mx-auto px-4 md:px-6">
 			<div class="max-h-96 bg-white  rounded-lg border shadow-sm" data-v0-t="card">

@@ -1,5 +1,7 @@
 -- name: GetFeedFollowsForUser :many
-SELECT * FROM feed_follows WHERE user_id = $1;
+SELECT feed_follows.*,feeds.name,feeds.url FROM feed_follows
+JOIN feeds on feed_follows.feed_id = feeds.id
+WHERE feed_follows.user_id = $1;
 --
 
 -- name: CreateFeedFollow :one

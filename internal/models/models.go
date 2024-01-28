@@ -65,23 +65,23 @@ type FeedFollow struct {
 	FeedID    int32     `json:"feed_id"`
 }
 
-func DatabaseFeedFollowToFeedFollow(feedFollow database.FeedFollow) FeedFollow {
-	return FeedFollow{
-		ID:        feedFollow.ID,
-		CreatedAt: feedFollow.CreatedAt,
-		UpdatedAt: feedFollow.UpdatedAt,
-		UserID:    feedFollow.UserID,
-		FeedID:    feedFollow.FeedID,
-	}
-}
-
-func DatabaseFeedFollowsToFeedFollows(feedFollows []database.FeedFollow) []FeedFollow {
-	result := make([]FeedFollow, len(feedFollows))
-	for i, feedFollow := range feedFollows {
-		result[i] = DatabaseFeedFollowToFeedFollow(feedFollow)
-	}
-	return result
-}
+// func DatabaseFeedFollowToFeedFollow(feedFollow database.FeedFollow) FeedFollow {
+// 	return FeedFollow{
+// 		ID:        feedFollow.ID,
+// 		CreatedAt: feedFollow.CreatedAt,
+// 		UpdatedAt: feedFollow.UpdatedAt,
+// 		UserID:    feedFollow.UserID,
+// 		FeedID:    feedFollow.FeedID,
+// 	}
+// }
+//
+// func DatabaseFeedFollowsToFeedFollows(feedFollows []database.FeedFollow) []FeedFollow {
+// 	result := make([]FeedFollow, len(feedFollows))
+// 	for i, feedFollow := range feedFollows {
+// 		result[i] = DatabaseFeedFollowToFeedFollow(feedFollow)
+// 	}
+// 	return result
+// }
 
 type Post struct {
 	ID          int32      `json:"id"`
@@ -98,7 +98,9 @@ func DatabaseFeedPostToPostForUserRow(post database.GetFeedPostsRow) database.Ge
 	return database.GetPostsForUserRow(post)
 }
 
-func DatabaseFeedPostToPostForUserRows(posts []database.GetFeedPostsRow) []database.GetPostsForUserRow {
+func DatabaseFeedPostToPostForUserRows(
+	posts []database.GetFeedPostsRow,
+) []database.GetPostsForUserRow {
 	result := make([]database.GetPostsForUserRow, len(posts))
 	for i, post := range posts {
 		result[i] = DatabaseFeedPostToPostForUserRow(post)

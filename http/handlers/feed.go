@@ -102,14 +102,16 @@ func HandlerFeedDelete(w http.ResponseWriter, r *http.Request) {
 func HandlerFeedCreate(w http.ResponseWriter, r *http.Request) {
 	// feeds/create
 	ctx := r.Context()
+	user := ctx.Value("user").(database.User)
 
-	feeds, err := internal.DB.GetFeeds(ctx)
+	// feeds, err := internal.DB.GetFeeds(ctx)
+	feedFollows, err := internal.DB.GetFeedFollowsForUser(ctx, user.ID)
 	if err != nil {
 		RespondWithError(w, http.StatusInternalServerError, "Couldn't get feeds")
 		return
 	}
 
-	views.Feeds(feeds).Render(r.Context(), w)
+	views.Feeds(feedFollows).Render(ctx, w)
 }
 
 func HandlerFeedStore(w http.ResponseWriter, r *http.Request) {
@@ -145,7 +147,7 @@ func HandlerFeedStore(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = internal.DB.CreateFeedFollow(r.Context(), database.CreateFeedFollowParams{
+	feedFollow, err := internal.DB.CreateFeedFollow(r.Context(), database.CreateFeedFollowParams{
 		CreatedAt: time.Now().UTC(),
 		UpdatedAt: time.Now().UTC(),
 		UserID:    user.ID,
@@ -156,14 +158,15 @@ func HandlerFeedStore(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	views.FeedLi(feed).Render(r.Context(), w)
-	// respondWithJSON(w, http.StatusOK, struct {
-	// 	feed       models.Feed
-	// 	feedFollow models.FeedFollow
-	// }{
-	// 	feed:       models.DatabaseFeedToFeed(feed),
-	// 	feedFollow: models.DatabaseFeedFollowToFeedFollow(feedFollow),
-	// })
+	views.FeedLi(database.GetFeedFollowsForUserRow{
+		Name:      feed.Name,
+		Url:       feed.Url,
+		FeedID:    feed.ID,
+		UserID:    feedFollow.UserID,
+		ID:        feedFollow.ID,
+		CreatedAt: feedFollow.CreatedAt,
+		UpdatedAt: feedFollow.UpdatedAt,
+	}).Render(r.Context(), w)
 }
 
 func HandlerGetFeeds(w http.ResponseWriter, r *http.Request) {

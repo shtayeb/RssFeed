@@ -57,10 +57,9 @@ func HandlerChangePassword(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user := ctx.Value("user").(database.User)
-	hashedCurrentPassword, _ := hashPassword(currentPassword)
-	log.Printf("current Password:%v ", currentPassword)
-	log.Printf("hashedCurrentPassword: %v ", hashedCurrentPassword)
-	log.Printf("Auth User password: %v ", user.Password)
+	// log.Printf("current Password:%v ", currentPassword)
+	// log.Printf("hashedCurrentPassword: %v ", hashedCurrentPassword)
+	// log.Printf("Auth User password: %v ", user.Password)
 
 	if checkPasswordHash(currentPassword, user.Password) {
 		// current password is wrong
