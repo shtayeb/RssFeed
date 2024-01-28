@@ -7,17 +7,18 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/shtayeb/rssfeed/internal"
 	"github.com/shtayeb/rssfeed/internal/database"
 	"github.com/shtayeb/rssfeed/internal/models"
 	"github.com/shtayeb/rssfeed/views"
 )
 
-func (cfg *ApiConfig) HandlerFeedPosts(w http.ResponseWriter, r *http.Request) {
+func HandlerFeedPosts(w http.ResponseWriter, r *http.Request) {
 	// Get posts of a specific post
 	feedId, err := strconv.Atoi(chi.URLParam(r, "feedID"))
 	if err != nil {
 		log.Println(err)
-		respondWithError(w, http.StatusInternalServerError, "Invalid feed ID")
+		RespondWithError(w, http.StatusInternalServerError, "Invalid feed ID")
 		return
 	}
 
@@ -31,49 +32,49 @@ func (cfg *ApiConfig) HandlerFeedPosts(w http.ResponseWriter, r *http.Request) {
 		page = 1
 	}
 
-	feed, err := cfg.DB.GetFeed(r.Context(), int32(feedId))
+	feed, err := internal.DB.GetFeed(r.Context(), int32(feedId))
 	if err != nil {
 		log.Printf("Here is why: %v", err)
-		respondWithError(w, http.StatusInternalServerError, "Couldn't get feed")
+		RespondWithError(w, http.StatusInternalServerError, "Couldn't get feed")
 		return
 	}
 
-	posts, err := cfg.DB.GetFeedPosts(r.Context(), database.GetFeedPostsParams{
+	posts, err := internal.DB.GetFeedPosts(r.Context(), database.GetFeedPostsParams{
 		FeedID: int32(feedId),
 		Limit:  int32(limit),
 		Offset: int32(limit * (page - 1)),
 	})
 	if err != nil {
 		log.Printf("Here is why: %v", err)
-		respondWithError(w, http.StatusInternalServerError, "Couldn't get feed")
+		RespondWithError(w, http.StatusInternalServerError, "Couldn't get feed")
 		return
 	}
 
-	totalRecordInDB, _ := cfg.DB.GetFeedPostsCount(r.Context(), feed.ID)
+	totalRecordInDB, _ := internal.DB.GetFeedPostsCount(r.Context(), feed.ID)
 	pagination := paginate(int(totalRecordInDB), limit, page)
 
 	views.FeedPosts(feed, models.DatabaseFeedPostToPostForUserRows(posts), pagination).
 		Render(r.Context(), w)
 }
 
-func (cfg *ApiConfig) HandlerFeedDelete(w http.ResponseWriter, r *http.Request) {
+func HandlerFeedDelete(w http.ResponseWriter, r *http.Request) {
 	feedId, err := strconv.Atoi(chi.URLParam(r, "feedID"))
 	if err != nil {
 		log.Println(err)
-		respondWithError(w, http.StatusInternalServerError, "Invalid feed ID")
+		RespondWithError(w, http.StatusInternalServerError, "Invalid feed ID")
 		return
 	}
 
 	user := r.Context().Value("user").(database.User)
-	feed, err := cfg.DB.GetFeed(r.Context(), int32(feedId))
+	feed, err := internal.DB.GetFeed(r.Context(), int32(feedId))
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "Couldn't get feed")
+		RespondWithError(w, http.StatusInternalServerError, "Couldn't get feed")
 		return
 	}
 
 	// // Authorization
 	if user.ID != feed.UserID {
-		respondWithError(
+		RespondWithError(
 			w,
 			http.StatusInternalServerError,
 			"You are not authorized to delete this feed",
@@ -85,9 +86,9 @@ func (cfg *ApiConfig) HandlerFeedDelete(w http.ResponseWriter, r *http.Request) 
 		ID:     feed.ID,
 		UserID: user.ID,
 	}
-	err = cfg.DB.DeleteFeed(r.Context(), param)
+	err = internal.DB.DeleteFeed(r.Context(), param)
 	if err != nil {
-		respondWithError(
+		RespondWithError(
 			w,
 			http.StatusInternalServerError,
 			"Failed to delete the feed",
@@ -98,20 +99,20 @@ func (cfg *ApiConfig) HandlerFeedDelete(w http.ResponseWriter, r *http.Request) 
 	// views.FeedLi(feed).Render(r.Context(), w)
 }
 
-func (cfg *ApiConfig) HandlerFeedCreate(w http.ResponseWriter, r *http.Request) {
+func HandlerFeedCreate(w http.ResponseWriter, r *http.Request) {
 	// feeds/create
 	ctx := r.Context()
 
-	feeds, err := cfg.DB.GetFeeds(ctx)
+	feeds, err := internal.DB.GetFeeds(ctx)
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "Couldn't get feeds")
+		RespondWithError(w, http.StatusInternalServerError, "Couldn't get feeds")
 		return
 	}
 
 	views.Feeds(feeds).Render(r.Context(), w)
 }
 
-func (cfg *ApiConfig) HandlerFeedStore(w http.ResponseWriter, r *http.Request) {
+func HandlerFeedStore(w http.ResponseWriter, r *http.Request) {
 	type parameters struct {
 		Name string `json:"name"`
 		URL  string `json:"url"`
@@ -131,7 +132,7 @@ func (cfg *ApiConfig) HandlerFeedStore(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("FeedName: %v ---- FeedURL: %v", params.Name, params.URL)
 
-	feed, err := cfg.DB.CreateFeed(r.Context(), database.CreateFeedParams{
+	feed, err := internal.DB.CreateFeed(r.Context(), database.CreateFeedParams{
 		CreatedAt: time.Now().UTC(),
 		UpdatedAt: time.Now().UTC(),
 		Name:      params.Name,
@@ -140,18 +141,18 @@ func (cfg *ApiConfig) HandlerFeedStore(w http.ResponseWriter, r *http.Request) {
 	})
 	if err != nil {
 		log.Printf("Failed to create feed: %v", err)
-		respondWithError(w, http.StatusInternalServerError, "Couldn't create feed")
+		RespondWithError(w, http.StatusInternalServerError, "Couldn't create feed")
 		return
 	}
 
-	_, err = cfg.DB.CreateFeedFollow(r.Context(), database.CreateFeedFollowParams{
+	_, err = internal.DB.CreateFeedFollow(r.Context(), database.CreateFeedFollowParams{
 		CreatedAt: time.Now().UTC(),
 		UpdatedAt: time.Now().UTC(),
 		UserID:    user.ID,
 		FeedID:    feed.ID,
 	})
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "Couldn't create feed follow")
+		RespondWithError(w, http.StatusInternalServerError, "Couldn't create feed follow")
 		return
 	}
 
@@ -165,12 +166,12 @@ func (cfg *ApiConfig) HandlerFeedStore(w http.ResponseWriter, r *http.Request) {
 	// })
 }
 
-func (cfg *ApiConfig) HandlerGetFeeds(w http.ResponseWriter, r *http.Request) {
-	feeds, err := cfg.DB.GetFeeds(r.Context())
+func HandlerGetFeeds(w http.ResponseWriter, r *http.Request) {
+	feeds, err := internal.DB.GetFeeds(r.Context())
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "Couldn't get feeds")
+		RespondWithError(w, http.StatusInternalServerError, "Couldn't get feeds")
 		return
 	}
 
-	respondWithJSON(w, http.StatusOK, models.DatabaseFeedsToFeeds(feeds))
+	RespondWithJSON(w, http.StatusOK, models.DatabaseFeedsToFeeds(feeds))
 }

@@ -6,6 +6,6 @@ import (
 	"github.com/shtayeb/rssfeed/views"
 )
 
-func (cfg *ApiConfig) HandlerNotFoundPage(w http.ResponseWriter, r *http.Request) {
+func HandlerNotFoundPage(w http.ResponseWriter, r *http.Request) {
 	views.NotFoundPage().Render(r.Context(), w)
 }

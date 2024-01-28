@@ -1,4 +1,4 @@
-package handlers
+package middlewares
 
 import (
 	"context"
@@ -6,7 +6,9 @@ import (
 	"net/http"
 
 	"github.com/google/uuid"
-	"github.com/shtayeb/rssfeed/internal/session"
+	"github.com/shtayeb/rssfeed/http/handlers"
+	"github.com/shtayeb/rssfeed/http/session"
+	"github.com/shtayeb/rssfeed/internal"
 )
 
 type Session struct {
@@ -17,7 +19,7 @@ type Session struct {
 	UserID    int
 }
 
-func (cfg *ApiConfig) SessionMiddleware(next http.Handler) http.Handler {
+func SessionMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
@@ -35,7 +37,7 @@ func (cfg *ApiConfig) SessionMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		user, err := cfg.DB.GetUserByAPIKey(r.Context(), (user_id).(int32))
+		user, err := internal.DB.GetUserByAPIKey(r.Context(), (user_id).(int32))
 		if err != nil {
 			// Destroy the sesion
 			err := session.SessionManager.Destroy(r.Context())
@@ -50,7 +52,7 @@ func (cfg *ApiConfig) SessionMiddleware(next http.Handler) http.Handler {
 			ctx = context.WithValue(r.Context(), "msgs", msgs)
 			// redirect back
 			// http.Redirect(w, r.WithContext(ctx), "/test", http.StatusSeeOther)
-			respondWithError(
+			handlers.RespondWithError(
 				w,
 				http.StatusNotFound,
 				"You are not authenticated - Invalid user_id in the session",
@@ -64,24 +66,19 @@ func (cfg *ApiConfig) SessionMiddleware(next http.Handler) http.Handler {
 }
 
 // HTTP middleware setting a value on the request context
-func (cfg *ApiConfig) AuthMiddleware(next http.Handler) http.Handler {
+func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Clean UP
-		// What if cookie expires on the client and the record exists in our db, It will have unusable data
-		// SOLUTION: have a go routine for cleanup
-		// session token must to be changed when a user logs in or out of your application
-
 		ctx := r.Context()
 		user := ctx.Value("user")
 
 		if user == nil {
 			// redirect user to login page
-
 			msgs := []map[string]string{
 				{"msg_type": "success", "msg": "Please login first"},
 			}
 			ctx = context.WithValue(ctx, "msgs", msgs)
 			// TODO:  context is lost in the redirect
+			// r.NewRequestWithContext(ctx)
 			http.Redirect(w, r.WithContext(ctx), "/login", http.StatusSeeOther)
 			return
 		}

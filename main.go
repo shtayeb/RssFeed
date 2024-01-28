@@ -1,70 +1,24 @@
 package main
 
 import (
-	"database/sql"
 	"log"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
-	"github.com/joho/godotenv"
-	"github.com/shtayeb/rssfeed/handlers"
-	"github.com/shtayeb/rssfeed/internal/database"
-	"github.com/shtayeb/rssfeed/internal/session"
+	"github.com/shtayeb/rssfeed/http/handlers"
+	"github.com/shtayeb/rssfeed/http/middlewares"
+	"github.com/shtayeb/rssfeed/http/session"
+	"github.com/shtayeb/rssfeed/internal"
 
 	_ "github.com/lib/pq"
 )
 
 func main() {
-	godotenv.Load(".env")
-
-	APP_KEY := os.Getenv("APP_KEY")
-	if APP_KEY == "" {
-		log.Fatal("App key is not set. Please create an application key !")
-	}
-
-	PORT := os.Getenv("PORT")
-	if PORT == "" {
-		log.Fatal("PORT environment variable is not set")
-	}
-
-	DB_URL := os.Getenv("DATABASE_URL")
-	if DB_URL == "" {
-		log.Fatal("DATABASE_URL environment variable is not set")
-	}
-
-	APP_ENV := os.Getenv("APP_ENV")
-
-	db, err := sql.Open("postgres", DB_URL)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	dbQueries := database.New(db)
-
-	apiCfg := handlers.ApiConfig{
-		DB: dbQueries,
-		Config: handlers.Config{
-			AppKey:  APP_KEY,
-			AppEnv:  APP_ENV,
-			APP_URL: os.Getenv("APP_URL"),
-			MailConfig: handlers.MailConfig{
-				MAIL_HOST:         os.Getenv("MAIL_HOST"),
-				MAIL_PORT:         os.Getenv("MAIL_PORT"),
-				MAIL_USERNAME:     os.Getenv("MAIL_USERNAME"),
-				MAIL_PASSWORD:     os.Getenv("MAIL_PASSWORD"),
-				MAIL_FROM_ADDRESS: os.Getenv("MAIL_FROM_ADDRESS"),
-				MAIL_FROM_NAME:    os.Getenv("MAIL_FROM_NAME"),
-				MAIL_ENCRYPTION:   os.Getenv("MAIL_ENCRYPTION"),
-			},
-		},
-	}
-
-	// Sesison Manager
-	session.InitSessionManager(db)
+	// Loads ENV variables, initializes DB and Session Manager
+	internal.InitApp()
 
 	router := chi.NewRouter()
 	router.Use(cors.Handler(cors.Options{
@@ -79,12 +33,12 @@ func main() {
 	// Middlewares
 	router.Use(middleware.Logger)
 
-	if APP_ENV == "" || APP_ENV != "production" {
+	if internal.Config.APP_ENV == "" || internal.Config.APP_ENV != "production" {
 		router.Use(middleware.Recoverer)
 	}
 
 	router.Use(session.SessionManager.LoadAndSave)
-	router.Use(apiCfg.SessionMiddleware)
+	router.Use(middlewares.SessionMiddleware)
 
 	// Static files handler
 	fs := http.FileServer(http.Dir("public"))
@@ -92,17 +46,17 @@ func main() {
 
 	// Public Routes
 	router.Group(func(r chi.Router) {
-		r.Get("/", apiCfg.HandlerLandingPage)
-		r.Get("/login", apiCfg.HandlerLoginView)
-		r.Post("/login", apiCfg.HandlerLogin)
-		r.Get("/forgot-password", apiCfg.ForgotPasswordView)
-		r.Post("/forgot-password", apiCfg.ForgotPassword)
+		r.Get("/", handlers.HandlerLandingPage)
+		r.Get("/login", handlers.HandlerLoginView)
+		r.Post("/login", handlers.HandlerLogin)
+		r.Get("/forgot-password", handlers.ForgotPasswordView)
+		r.Post("/forgot-password", handlers.ForgotPassword)
 
-		r.Post("/reset-password", apiCfg.ResetPassword)
-		r.Get("/reset-password/{token}", apiCfg.ResetPasswordView)
+		r.Post("/reset-password", handlers.ResetPassword)
+		r.Get("/reset-password/{token}", handlers.ResetPasswordView)
 
-		r.Get("/register", apiCfg.HandlerRegisterView)
-		r.Post("/register", apiCfg.HandlerUsersCreate)
+		r.Get("/register", handlers.HandlerRegisterView)
+		r.Post("/register", handlers.HandlerUsersCreate)
 
 		r.Get("/healthz", handlers.HandlerReadiness)
 		r.Get("/err", handlers.HandlerErr)
@@ -110,36 +64,36 @@ func main() {
 
 	// Private Routes - Require Authentication
 	router.Group(func(ar chi.Router) {
-		ar.Use(apiCfg.AuthMiddleware)
-		ar.Get("/posts", apiCfg.HandlerPostsPage)
-		ar.Post("/logout", apiCfg.HandlerLogout)
+		ar.Use(middlewares.AuthMiddleware)
+		ar.Get("/posts", handlers.HandlerPostsPage)
+		ar.Post("/logout", handlers.HandlerLogout)
 
-		ar.Get("/feeds", apiCfg.HandlerFeedCreate)
-		ar.Get("/feeds/{feedID}/posts", apiCfg.HandlerFeedPosts)
-		ar.Post("/feeds", apiCfg.HandlerFeedStore)
-		ar.Delete("/feeds/{feedID}", apiCfg.HandlerFeedDelete)
+		ar.Get("/feeds", handlers.HandlerFeedCreate)
+		ar.Get("/feeds/{feedID}/posts", handlers.HandlerFeedPosts)
+		ar.Post("/feeds", handlers.HandlerFeedStore)
+		ar.Delete("/feeds/{feedID}", handlers.HandlerFeedDelete)
 
-		ar.Get("/feeds/following", apiCfg.HandlerFeedFollowsGet)
-		ar.Post("/feeds/following", apiCfg.HandlerFeedFollowCreate)
-		ar.Delete("/feeds/following/{feedFollowID}", apiCfg.HandlerFeedFollowDelete)
+		ar.Get("/feeds/following", handlers.HandlerFeedFollowsGet)
+		ar.Post("/feeds/following", handlers.HandlerFeedFollowCreate)
+		ar.Delete("/feeds/following/{feedFollowID}", handlers.HandlerFeedFollowDelete)
 
-		ar.Get("/users", apiCfg.HandlerUsersGet)
-		ar.Get("/user/profile", apiCfg.HanlderUserProfile)
-		ar.Post("/user", apiCfg.HandlerProfileUpdate)
-		ar.Get("/user", apiCfg.HandlerGetAuthUser)
-		ar.Post("/user/change-password", apiCfg.HandlerChangePassword)
+		ar.Get("/users", handlers.HandlerUsersGet)
+		ar.Get("/user/profile", handlers.HanlderUserProfile)
+		ar.Post("/user", handlers.HandlerProfileUpdate)
+		ar.Get("/user", handlers.HandlerGetAuthUser)
+		ar.Post("/user/change-password", handlers.HandlerChangePassword)
 	})
 
-	router.NotFound(apiCfg.HandlerNotFoundPage)
+	router.NotFound(handlers.HandlerNotFoundPage)
 
 	srv := &http.Server{
-		Addr:    ":" + PORT,
+		Addr:    ":" + internal.Config.PORT,
 		Handler: router,
 	}
 
 	// Fecht posts routne
 	shouldFetch := true
-	if APP_ENV == "" || APP_ENV != "production" {
+	if internal.Config.APP_ENV == "" || internal.Config.APP_ENV != "production" {
 		log.Println("Not fetching posts right now !")
 		shouldFetch = false
 	}
@@ -147,9 +101,9 @@ func main() {
 	if shouldFetch {
 		const collectionConcurrency = 10
 		const collectionInterval = time.Minute
-		go startScraping(dbQueries, collectionConcurrency, collectionInterval)
+		go internal.StartScraping(internal.DB, collectionConcurrency, collectionInterval)
 	}
 
-	log.Printf("Serving on port: %s\n", PORT)
+	log.Printf("Serving on port: %s\n", internal.Config.PORT)
 	log.Fatal(srv.ListenAndServe())
 }
