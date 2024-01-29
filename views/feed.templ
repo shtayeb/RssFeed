@@ -2,49 +2,51 @@ package views
 
 import "github.com/shtayeb/rssfeed/internal/database"
 import "fmt"
+import "github.com/shtayeb/rssfeed/http/types"
+
+templ AllFeeds(feeds []database.Feed,pagination types.Pagination) {
+	@layout() {
+		<section class="max-w-screen-xl mx-auto px-4 md:px-6">
+			<div class="py-8">
+				<h2 class="text-3xl font-bold mb-6">All Feeds</h2>
+				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+					for _,feed:= range feeds{
+						<div class="rounded-lg border bg-gray-50 shadow-sm" data-v0-t="card">
+							<div class="p-6 flex flex-col items-center space-y-4">
+							<a href={ templ.URL(fmt.Sprintf("/feeds/%v/posts", feed.ID)) } class="p-6 flex flex-col items-center space-y-4">
+								<h3 class="text-xl font-bold">{ feed.Name }</h3>
+              </a>
+								<p class="text-gray-500 ">Short description of the source.</p>
+                // The Actions
+                <button hx-put={ fmt.Sprintf("/feeds/following/%v",feed.ID) } type="button" class="bg-black text-white rounded-full px-3 py-2" >Follow-Unfollow</button>
+
+                // <button hx-post="" type="button" class="border-2 hover:bg-black/50 hover:text-white rounded-full px-3 py-2" >Unfollow</button>
+
+							</div>
+              						</div>
+					}
+				</div>
+				@Pagination(pagination)
+			</div>
+		</section>
+	}
+}
+
 
 templ FeedLi(feedFollow database.GetFeedFollowsForUserRow) {
 	<tr id={ fmt.Sprintf("feed-%v", feedFollow.ID) } class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
 		<td class="p-4 align-middle ">{ feedFollow.Name }</td>
 		<td class="p-4 align-middle ">{ feedFollow.Url }</td>
 		<td class="p-4 flex items-center gap-3 ">
-			<form
-				method="delete"
-				hx-delete="/feeds/following/feedFollowI"
-				hx-ext="disable-element"
-				hx-disable-element="this"
-				hx-confirm="Are you sure?"
-				hx-indicator=".progress"
-			>
-				<button class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-yellow-500 text-primary-foreground hover:bg-yellow-500/90 h-10 w-10">
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						width="24"
-						height="24"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="2"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						class="h-4 w-4"
-					>
-						<path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
-						<path d="m15 5 4 4"></path>
-					</svg>
-					<span class="sr-only">Follow/Unfollow</span>
-				</button>
-			</form>
-			<form
-				hx-delete={ fmt.Sprintf("/feeds/%v", feedFollow.ID) }
+				<button 
+        
 				hx-ext="disable-element"
 				hx-target={ fmt.Sprintf("#feed-%v", feedFollow.ID) }
 				hx-disable-element="this"
-				hx-confirm="Are you sure?"
 				hx-indicator=".progress"
-				class="px-3 py-2"
-			>
-				<button class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-red-400 hover:bg-accent hover:text-accent-foreground h-10 w-10">
+				hx-confirm="Are you sure?"
+        hx-put={ fmt.Sprintf("/feeds/following/%v",feedFollow.FeedID) } class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-red-400 hover:bg-accent hover:text-accent-foreground h-10 w-10">
+
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
 						width="24"
@@ -61,9 +63,8 @@ templ FeedLi(feedFollow database.GetFeedFollowsForUserRow) {
 						<path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
 						<path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
 					</svg>
-					<span class="sr-only">Delete</span>
+					<span class="sr-only">Follow-Unfollow</span>
 				</button>
-			</form>
 		</td>
 	</tr>
 }

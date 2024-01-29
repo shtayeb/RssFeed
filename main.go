@@ -68,14 +68,15 @@ func main() {
 		ar.Get("/posts", handlers.HandlerPostsPage)
 		ar.Post("/logout", handlers.HandlerLogout)
 
-		ar.Get("/feeds", handlers.HandlerFeedCreate)
+		ar.Get("/feeds", handlers.HandlerGetFeeds)
+		ar.Get("/user/feeds", handlers.HandlerFeedCreate)
 		ar.Get("/feeds/{feedID}/posts", handlers.HandlerFeedPosts)
 		ar.Post("/feeds", handlers.HandlerFeedStore)
 		ar.Delete("/feeds/{feedID}", handlers.HandlerFeedDelete)
 
-		ar.Get("/feeds/following", handlers.HandlerFeedFollowsGet)
-		ar.Post("/feeds/following", handlers.HandlerFeedFollowCreate)
-		ar.Delete("/feeds/following/{feedFollowID}", handlers.HandlerFeedFollowDelete)
+		// ar.Get("/feeds/following", handlers.HandlerFeedFollowsGet)
+		// ar.Post("/feeds/following", handlers.HandlerFeedFollowCreate)
+		ar.Put("/feeds/following/{feedID}", handlers.HandlerToggleFeedFollow)
 
 		ar.Get("/users", handlers.HandlerUsersGet)
 		ar.Get("/user/profile", handlers.HanlderUserProfile)

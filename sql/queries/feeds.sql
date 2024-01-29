@@ -35,3 +35,6 @@ LIMIT $2 offset $3;
 -- name: GetFeedPostsCount :one
 SELECT COUNT(*) FROM posts WHERE feed_id = $1;
 
+-- name: GetFeedsCount :one
+SELECT COUNT(*) FROM feeds; 
+

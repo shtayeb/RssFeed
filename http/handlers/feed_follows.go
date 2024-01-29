@@ -7,96 +7,81 @@ import (
 	"time"
 
 	"github.com/angelofallars/htmx-go"
-	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/v5"
 	"github.com/shtayeb/rssfeed/internal"
 	"github.com/shtayeb/rssfeed/internal/database"
 	"github.com/shtayeb/rssfeed/views"
 )
 
-// GET: feeds/following
-// List all feeds that a user is following
-func HandlerFeedFollowsGet(w http.ResponseWriter, r *http.Request) {
-	user := r.Context().Value("user").(database.User)
-
-	feedFollows, err := internal.DB.GetFeedFollowsForUser(r.Context(), user.ID)
-	if err != nil {
-		RespondWithError(w, http.StatusInternalServerError, "Could'nt get your following feeds")
-	}
-
-	RespondWithJSON(w, http.StatusOK, feedFollows)
-}
-
-func HandlerFeedFollowCreate(w http.ResponseWriter, r *http.Request) {
+func HandlerToggleFeedFollow(w http.ResponseWriter, r *http.Request) {
 	feedId, err := strconv.Atoi(chi.URLParam(r, "feedID"))
 	if err != nil {
-		log.Println(err)
+		log.Printf("Failed to parse feedID: %v", err)
 		RespondWithError(w, http.StatusInternalServerError, "Invalid feed ID")
 		return
 	}
 
+	msgs := []map[string]string{}
+	// Get feed follow
 	user := r.Context().Value("user").(database.User)
-
-	feedFollow, err := internal.DB.CreateFeedFollow(r.Context(), database.CreateFeedFollowParams{
-		CreatedAt: time.Now().UTC(),
-		UpdatedAt: time.Now().UTC(),
-		UserID:    user.ID,
-		FeedID:    int32(feedId),
-	})
-
-	log.Printf("feedFollow: %v", feedFollow)
+	feedFollow, err := internal.DB.GetFeedFollowForUser(
+		r.Context(),
+		database.GetFeedFollowForUserParams{
+			UserID: int32(user.ID),
+			FeedID: int32(feedId),
+		},
+	)
 	if err != nil {
-		msgs := []map[string]string{
-			{"msg_type": "error", "msg": "Couldn't create feed follow"},
+		// follow
+		log.Printf("Follow: %v", err)
+		user := r.Context().Value("user").(database.User)
+		_, err := internal.DB.CreateFeedFollow(r.Context(), database.CreateFeedFollowParams{
+			CreatedAt: time.Now().UTC(),
+			UpdatedAt: time.Now().UTC(),
+			UserID:    user.ID,
+			FeedID:    int32(feedId),
+		})
+		if err != nil {
+			msgs = []map[string]string{
+				{
+					"msg_type": "error",
+					"msg":      "Could'nt follow the feed, try again!",
+				},
+			}
+		} else {
+			msgs = []map[string]string{
+				{
+					"msg_type": "success",
+					"msg":      "Feed has been followed",
+				},
+			}
 		}
-		htmx.NewResponse().
-			RenderTempl(r.Context(), w, views.RenderMessages(msgs))
-		// RespondWithError(w, http.StatusInternalServerError, "Couldn't create feed follow")
+	} else {
+		log.Printf("Unfollow")
+		// Unfollow
+		err = internal.DB.DeleteFeedFollow(r.Context(), database.DeleteFeedFollowParams{
+			UserID: user.ID,
+			ID:     int32(feedFollow.ID),
+		})
+
+		if err != nil {
+			msgs = []map[string]string{
+				{
+					"msg_type": "error",
+					"msg":      "Could'nt unfollow the feed, try again!",
+				},
+			}
+		} else {
+			msgs = []map[string]string{
+				{
+					"msg_type": "info",
+					"msg":      "Feed has been Unfollowed",
+				},
+			}
+		}
+
 	}
 
-	msgs := []map[string]string{
-		{"msg_type": "success", "msg": "You have followed the feed"},
-	}
 	htmx.NewResponse().
 		RenderTempl(r.Context(), w, views.RenderMessages(msgs))
-
-	// RespondWithJSON(w, http.StatusOK, models.DatabaseFeedFollowToFeedFollow(feedFollow))
-}
-
-func HandlerFeedFollowDelete(
-	w http.ResponseWriter,
-	r *http.Request,
-) {
-	user := r.Context().Value("user").(database.User)
-	feedFollowID, err := strconv.Atoi(chi.URLParam(r, "feedFollowID"))
-	if err != nil {
-		msgs := []map[string]string{
-			{"msg_type": "error", "msg": "Couldn't decode parameters"},
-		}
-		htmx.NewResponse().
-			RenderTempl(r.Context(), w, views.RenderMessages(msgs))
-
-		return
-		// RespondWithError(w, http.StatusInternalServerError, "Couldn't decode parameters")
-	}
-
-	err = internal.DB.DeleteFeedFollow(r.Context(), database.DeleteFeedFollowParams{
-		UserID: user.ID,
-		ID:     int32(feedFollowID),
-	})
-	if err != nil {
-		msgs := []map[string]string{
-			{"msg_type": "error", "msg": "Couldn't create feed follow"},
-		}
-		htmx.NewResponse().
-			RenderTempl(r.Context(), w, views.RenderMessages(msgs))
-		// RespondWithError(w, http.StatusInternalServerError, "Couldn't create feed follow")
-		return
-	}
-	msgs := []map[string]string{
-		{"msg_type": "success", "msg": "Couldn't create feed follow"},
-	}
-	htmx.NewResponse().
-		RenderTempl(r.Context(), w, views.RenderMessages(msgs))
-
-	// RespondWithJSON(w, http.StatusOK, struct{}{})
 }

@@ -111,6 +111,8 @@ func HandlerFeedCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Println("YOOOOOOOOOOOOOOOOO", feedFollows)
+
 	views.Feeds(feedFollows).Render(ctx, w)
 }
 
@@ -172,9 +174,22 @@ func HandlerFeedStore(w http.ResponseWriter, r *http.Request) {
 func HandlerGetFeeds(w http.ResponseWriter, r *http.Request) {
 	feeds, err := internal.DB.GetFeeds(r.Context())
 	if err != nil {
+		log.Printf("failed to get feeds from DB: %v", err)
 		RespondWithError(w, http.StatusInternalServerError, "Couldn't get feeds")
 		return
 	}
 
-	RespondWithJSON(w, http.StatusOK, models.DatabaseFeedsToFeeds(feeds))
+	limit, err := strconv.Atoi(r.URL.Query().Get("size"))
+	if err != nil {
+		limit = 9
+	}
+	page, err := strconv.Atoi(r.URL.Query().Get("page"))
+	if err != nil || page <= 0 {
+		page = 1
+	}
+
+	totalRecordInDB, _ := internal.DB.GetFeedsCount(r.Context())
+	pagination := paginate(int(totalRecordInDB), limit, page)
+
+	views.AllFeeds(feeds, pagination).Render(r.Context(), w)
 }
