@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"strconv"
@@ -81,7 +82,7 @@ func HandlerToggleFeedFollow(w http.ResponseWriter, r *http.Request) {
 		}
 
 	}
-
+	ctx := context.WithValue(r.Context(), "msgs", msgs)
 	htmx.NewResponse().
-		RenderTempl(r.Context(), w, views.RenderMessages(msgs))
+		RenderTempl(ctx, w, views.FollowUnfollowBtn(feedFollow))
 }

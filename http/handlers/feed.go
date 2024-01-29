@@ -111,8 +111,6 @@ func HandlerFeedCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Println("YOOOOOOOOOOOOOOOOO", feedFollows)
-
 	views.Feeds(feedFollows).Render(ctx, w)
 }
 

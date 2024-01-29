@@ -1324,11 +1324,6 @@ select {
   background-color: rgb(254 249 195 / var(--tw-bg-opacity));
 }
 
-.bg-yellow-500 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(234 179 8 / var(--tw-bg-opacity));
-}
-
 .bg-gradient-to-r {
   background-image: linear-gradient(to right, var(--tw-gradient-stops));
 }
@@ -1804,6 +1799,10 @@ select {
   font-weight: 500;
 }
 
+.hover\:bg-black\/50:hover {
+  background-color: rgb(0 0 0 / 0.5);
+}
+
 .hover\:bg-black\/90:hover {
   background-color: rgb(0 0 0 / 0.9);
 }
@@ -1827,10 +1826,6 @@ select {
   background-color: rgb(31 41 55 / 0.9);
 }
 
-.hover\:bg-yellow-500\/90:hover {
-  background-color: rgb(234 179 8 / 0.9);
-}
-
 .hover\:text-blue-700:hover {
   --tw-text-opacity: 1;
   color: rgb(29 78 216 / var(--tw-text-opacity));
@@ -1839,6 +1834,11 @@ select {
 .hover\:text-indigo-500:hover {
   --tw-text-opacity: 1;
   color: rgb(99 102 241 / var(--tw-text-opacity));
+}
+
+.hover\:text-white:hover {
+  --tw-text-opacity: 1;
+  color: rgb(255 255 255 / var(--tw-text-opacity));
 }
 
 .hover\:underline:hover {
@@ -1986,6 +1986,11 @@ select {
 
   .sm\:text-lg {
     font-size: 1.125rem;
+    line-height: 1.75rem;
+  }
+
+  .sm\:text-xl {
+    font-size: 1.25rem;
     line-height: 1.75rem;
   }
 

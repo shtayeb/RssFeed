@@ -406,7 +406,7 @@ func navbar() templ.Component {
 			templ_7745c5c3_Var23 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<header class=\"bg-white \"><div class=\"max-w-screen-xl h-14 px-4 md:px-6 flex items-center container mx-auto border-b \"><a href=\"/\"><h1 class=\"text-2xl font-bold\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<header class=\"bg-white \"><div class=\"max-w-screen-xl h-14 px-4 md:px-6 flex items-center container mx-auto border-b \"><a href=\"/\"><h1 class=\"text-lg md:text-2xl font-bold\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
