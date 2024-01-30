@@ -154,10 +154,17 @@ func (q *Queries) GetFeedPostsCount(ctx context.Context, feedID int32) (int64, e
 
 const getFeeds = `-- name: GetFeeds :many
 SELECT id, created_at, updated_at, name, url, user_id, last_fetched_at FROM feeds
+ORDER BY feeds.created_at DESC
+LIMIT $1 offset $2
 `
 
-func (q *Queries) GetFeeds(ctx context.Context) ([]Feed, error) {
-	rows, err := q.db.QueryContext(ctx, getFeeds)
+type GetFeedsParams struct {
+	Limit  int32
+	Offset int32
+}
+
+func (q *Queries) GetFeeds(ctx context.Context, arg GetFeedsParams) ([]Feed, error) {
+	rows, err := q.db.QueryContext(ctx, getFeeds, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}

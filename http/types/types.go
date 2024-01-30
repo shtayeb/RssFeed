@@ -1,5 +1,12 @@
 package types
 
+import "github.com/shtayeb/rssfeed/internal/database"
+
+type Feed struct {
+	database.Feed
+	IsFollowing bool
+}
+
 type Pagination struct {
 	PerPage      int
 	CurrentPage  int

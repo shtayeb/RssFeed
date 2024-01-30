@@ -7,11 +7,12 @@ package database
 
 import (
 	"context"
+	"fmt"
+	"strings"
 	"time"
 )
 
 const createFeedFollow = `-- name: CreateFeedFollow :one
-
 
 INSERT INTO feed_follows (created_at, updated_at, user_id, feed_id)
 VALUES ($1, $2, $3, $4)
@@ -25,7 +26,6 @@ type CreateFeedFollowParams struct {
 	FeedID    int32
 }
 
-//
 func (q *Queries) CreateFeedFollow(ctx context.Context, arg CreateFeedFollowParams) (FeedFollow, error) {
 	row := q.db.QueryRowContext(ctx, createFeedFollow,
 		arg.CreatedAt,
@@ -54,34 +54,64 @@ type DeleteFeedFollowParams struct {
 	UserID int32
 }
 
-//
 func (q *Queries) DeleteFeedFollow(ctx context.Context, arg DeleteFeedFollowParams) error {
 	_, err := q.db.ExecContext(ctx, deleteFeedFollow, arg.ID, arg.UserID)
 	return err
 }
 
-const getFeedFollowForUser = `-- name: GetFeedFollowForUser :one
+const getFeedFollowForUser = `-- name: GetFeedFollowForUser :many
 
-SELECT id, created_at, updated_at, user_id, feed_id FROM feed_follows WHERE user_id = $1 AND feed_id = $2
+select id, created_at, updated_at, user_id, feed_id from feed_follows where user_id = $1 and feed_id in ($2)
 `
 
 type GetFeedFollowForUserParams struct {
-	UserID int32
-	FeedID int32
+	UserID  int32
+	FeedIds []int32
 }
 
-//
-func (q *Queries) GetFeedFollowForUser(ctx context.Context, arg GetFeedFollowForUserParams) (FeedFollow, error) {
-	row := q.db.QueryRowContext(ctx, getFeedFollowForUser, arg.UserID, arg.FeedID)
-	var i FeedFollow
-	err := row.Scan(
-		&i.ID,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-		&i.UserID,
-		&i.FeedID,
-	)
-	return i, err
+func (q *Queries) GetFeedFollowForUser(ctx context.Context, arg GetFeedFollowForUserParams) ([]FeedFollow, error) {
+	query := getFeedFollowForUser
+	fmt.Printf("this is query:%v \n\n", query)
+	fmt.Printf("this is params:%v \n \n", arg)
+	var queryParams []interface{}
+	queryParams = append(queryParams, arg.UserID)
+	if len(arg.FeedIds) > 0 {
+		for _, v := range arg.FeedIds {
+			queryParams = append(queryParams, v)
+		}
+		query = strings.Replace(query, "/*SLICE:feedIds*/?", strings.Repeat(",?", len(arg.FeedIds))[1:], 1)
+	} else {
+		query = strings.Replace(query, "/*SLICE:feedIds*/?", "NULL", 1)
+	}
+
+	fmt.Printf("this is query after slice:%v \n \n", query)
+	fmt.Printf("this is queryParams after slice:%v \n \n", queryParams)
+	rows, err := q.db.QueryContext(ctx, query, queryParams...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []FeedFollow
+	for rows.Next() {
+		var i FeedFollow
+		if err := rows.Scan(
+			&i.ID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.UserID,
+			&i.FeedID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getFeedFollowsForUser = `-- name: GetFeedFollowsForUser :many
@@ -129,4 +159,27 @@ func (q *Queries) GetFeedFollowsForUser(ctx context.Context, userID int32) ([]Ge
 		return nil, err
 	}
 	return items, nil
+}
+
+const getUserFollowingFeed = `-- name: GetUserFollowingFeed :one
+
+select id, created_at, updated_at, user_id, feed_id from feed_follows where user_id = $1 and feed_id = $2
+`
+
+type GetUserFollowingFeedParams struct {
+	UserID int32
+	FeedID int32
+}
+
+func (q *Queries) GetUserFollowingFeed(ctx context.Context, arg GetUserFollowingFeedParams) (FeedFollow, error) {
+	row := q.db.QueryRowContext(ctx, getUserFollowingFeed, arg.UserID, arg.FeedID)
+	var i FeedFollow
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.UserID,
+		&i.FeedID,
+	)
+	return i, err
 }

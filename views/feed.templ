@@ -4,21 +4,24 @@ import "github.com/shtayeb/rssfeed/internal/database"
 import "fmt"
 import "github.com/shtayeb/rssfeed/http/types"
 
-templ FollowUnfollowBtn(feedFollow database.FeedFollow) {
+templ FollowUnfollowBtn(feedId int32,isFollowing bool) {
 	<button
-		hx-put={ fmt.Sprintf("/feeds/following/%v", feedFollow) }
+		hx-put={ fmt.Sprintf("/feeds/following/%v", feedId) }
 		type="button"
 		class="bg-black text-white rounded-full px-3 py-2"
 	>
-Follow-Unfollow 
-	</button>
-
-  if ctx.Value("msgs") != nil{
-	  @RenderMessages(ctx.Value("msgs").([]map[string]string))
+  if isFollowing {
+    { "UnFollow" }
+  }else{
+    { "Follow" }
   }
+	</button>
+	if ctx.Value("msgs") != nil {
+		@RenderMessages(ctx.Value("msgs").([]map[string]string))
+	}
 }
 
-templ AllFeeds(feeds []database.Feed,pagination types.Pagination) {
+templ AllFeeds(feeds []types.Feed,pagination types.Pagination) {
 	@layout() {
 		<section class="max-w-screen-xl mx-auto px-4 md:px-6">
 			<div class="py-8">
@@ -28,11 +31,11 @@ templ AllFeeds(feeds []database.Feed,pagination types.Pagination) {
 						<div class="rounded-lg border bg-gray-50 shadow-sm" data-v0-t="card">
 							<div class="p-6 flex flex-col items-center space-y-4">
 								<a href={ templ.URL(fmt.Sprintf("/feeds/%v/posts", feed.ID)) } class="p-6 flex flex-col items-center space-y-4">
-									<h3 class="text-xl font-bold">{ feed.Name }</h3>
+									<h3 class="text-xl font-bold">{ feed.Feed.Name }</h3>
 								</a>
 								<p class="text-gray-500 ">Short description of the source.</p>
 								// The Actions
-								@FollowUnfollowBtn(feed.ID)
+								@FollowUnfollowBtn(feed.ID,feed.IsFollowing)
 								// <button hx-post="" type="button" class="border-2 hover:bg-black/50 hover:text-white rounded-full px-3 py-2" >Unfollow</button>
 							</div>
 						</div>

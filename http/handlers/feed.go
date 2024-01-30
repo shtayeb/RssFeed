@@ -1,12 +1,15 @@
 package handlers
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"reflect"
 	"strconv"
 	"time"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/shtayeb/rssfeed/http/types"
 	"github.com/shtayeb/rssfeed/internal"
 	"github.com/shtayeb/rssfeed/internal/database"
 	"github.com/shtayeb/rssfeed/internal/models"
@@ -170,15 +173,9 @@ func HandlerFeedStore(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandlerGetFeeds(w http.ResponseWriter, r *http.Request) {
-	feeds, err := internal.DB.GetFeeds(r.Context())
-	if err != nil {
-		log.Printf("failed to get feeds from DB: %v", err)
-		RespondWithError(w, http.StatusInternalServerError, "Couldn't get feeds")
-		return
-	}
-
 	limit, err := strconv.Atoi(r.URL.Query().Get("size"))
 	if err != nil {
+		println("err is nil ")
 		limit = 9
 	}
 	page, err := strconv.Atoi(r.URL.Query().Get("page"))
@@ -186,8 +183,60 @@ func HandlerGetFeeds(w http.ResponseWriter, r *http.Request) {
 		page = 1
 	}
 
+	feeds, err := internal.DB.GetFeeds(r.Context(), database.GetFeedsParams{
+		Limit:  int32(limit),
+		Offset: int32(limit * (page - 1)),
+	})
+	if err != nil {
+		log.Printf("failed to get feeds from DB: %v", err)
+		RespondWithError(w, http.StatusInternalServerError, "Couldn't get feeds")
+		return
+	}
+
+	// Get the feed ids
+	feedIds := getField("ID", feeds)
+	fmt.Printf("feedids: %v \n", feedIds)
+	// get the user following for all the feed iDS
+	user := r.Context().Value("user").(database.User)
+	userFeedFollowings, _ := internal.DB.GetFeedFollowForUser(
+		r.Context(),
+		database.GetFeedFollowForUserParams{
+			UserID:  int32(user.ID),
+			FeedIds: feedIds,
+		},
+	)
+
+	fmt.Printf("user ID: %v \n", user)
+	fmt.Printf("userFollowingFeeds: %v \n", userFeedFollowings)
+
+	newFeeds := []types.Feed{}
+
+	for _, feed := range feeds {
+		newFeed := types.Feed{
+			Feed: feed,
+		}
+		for _, userFeedFollow := range userFeedFollowings {
+			if feed.ID == userFeedFollow.FeedID {
+				newFeed.IsFollowing = true
+			} else {
+				newFeed.IsFollowing = false
+			}
+		}
+		newFeeds = append(newFeeds, newFeed)
+	}
+
 	totalRecordInDB, _ := internal.DB.GetFeedsCount(r.Context())
 	pagination := paginate(int(totalRecordInDB), limit, page)
 
-	views.AllFeeds(feeds, pagination).Render(r.Context(), w)
+	views.AllFeeds(newFeeds, pagination).Render(r.Context(), w)
+}
+
+func getField(field string, feeds []database.Feed) []int32 {
+	r := []int32{}
+	for _, feed := range feeds {
+		t := reflect.ValueOf(feed)
+		field := t.FieldByName(field)
+		r = append(r, int32(field.Int()))
+	}
+	return r
 }

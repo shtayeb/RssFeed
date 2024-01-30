@@ -25,13 +25,16 @@ func HandlerToggleFeedFollow(w http.ResponseWriter, r *http.Request) {
 	msgs := []map[string]string{}
 	// Get feed follow
 	user := r.Context().Value("user").(database.User)
-	feedFollow, err := internal.DB.GetFeedFollowForUser(
+	feedFollow, err := internal.DB.GetUserFollowingFeed(
 		r.Context(),
-		database.GetFeedFollowForUserParams{
+		database.GetUserFollowingFeedParams{
 			UserID: int32(user.ID),
 			FeedID: int32(feedId),
 		},
 	)
+
+	var isFollowing bool
+
 	if err != nil {
 		// follow
 		log.Printf("Follow: %v", err)
@@ -43,6 +46,7 @@ func HandlerToggleFeedFollow(w http.ResponseWriter, r *http.Request) {
 			FeedID:    int32(feedId),
 		})
 		if err != nil {
+			isFollowing = false
 			msgs = []map[string]string{
 				{
 					"msg_type": "error",
@@ -50,6 +54,7 @@ func HandlerToggleFeedFollow(w http.ResponseWriter, r *http.Request) {
 				},
 			}
 		} else {
+			isFollowing = true
 			msgs = []map[string]string{
 				{
 					"msg_type": "success",
@@ -66,6 +71,7 @@ func HandlerToggleFeedFollow(w http.ResponseWriter, r *http.Request) {
 		})
 
 		if err != nil {
+			isFollowing = true
 			msgs = []map[string]string{
 				{
 					"msg_type": "error",
@@ -73,6 +79,8 @@ func HandlerToggleFeedFollow(w http.ResponseWriter, r *http.Request) {
 				},
 			}
 		} else {
+
+			isFollowing = false
 			msgs = []map[string]string{
 				{
 					"msg_type": "info",
@@ -84,5 +92,5 @@ func HandlerToggleFeedFollow(w http.ResponseWriter, r *http.Request) {
 	}
 	ctx := context.WithValue(r.Context(), "msgs", msgs)
 	htmx.NewResponse().
-		RenderTempl(ctx, w, views.FollowUnfollowBtn(feedFollow))
+		RenderTempl(ctx, w, views.FollowUnfollowBtn(feedFollow.FeedID, isFollowing))
 }
