@@ -10,7 +10,9 @@ DELETE FROM feeds WHERE id = $1 AND user_id = $2;
 SELECT * FROM feeds WHERE id = $1;
 
 -- name: GetFeeds :many
-SELECT * FROM feeds;
+SELECT * FROM feeds
+ORDER BY feeds.created_at DESC
+LIMIT $1 offset $2;
 
 -- name: GetNextFeedsToFetch :many
 SELECT * FROM feeds
@@ -34,4 +36,7 @@ LIMIT $2 offset $3;
 
 -- name: GetFeedPostsCount :one
 SELECT COUNT(*) FROM posts WHERE feed_id = $1;
+
+-- name: GetFeedsCount :one
+SELECT COUNT(*) FROM feeds; 
 

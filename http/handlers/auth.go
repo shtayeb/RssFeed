@@ -5,31 +5,17 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"regexp"
-	"strings"
 	"time"
 
 	"github.com/angelofallars/htmx-go"
 	"github.com/go-chi/chi/v5"
+	"github.com/shtayeb/rssfeed/http/session"
+	"github.com/shtayeb/rssfeed/internal"
 	"github.com/shtayeb/rssfeed/internal/database"
 	"github.com/shtayeb/rssfeed/internal/models"
-	"github.com/shtayeb/rssfeed/internal/session"
 	"github.com/shtayeb/rssfeed/views"
 	"github.com/shtayeb/rssfeed/views/emails"
-	"golang.org/x/crypto/bcrypt"
 )
-
-func hashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
-	return string(bytes), err
-}
-
-func checkPasswordHash(password, hash string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-	return err == nil
-}
-
-var rxEmail = regexp.MustCompile(".+@.+\\..+")
 
 type UserRegisterParams struct {
 	Name                 string
@@ -40,7 +26,7 @@ type UserRegisterParams struct {
 	Errors               map[string]string
 }
 
-func (cfg *ApiConfig) HandlerChangePassword(w http.ResponseWriter, r *http.Request) {
+func HandlerChangePassword(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	// Get the user from session
 	// Get compare the hashed passwords
@@ -71,10 +57,9 @@ func (cfg *ApiConfig) HandlerChangePassword(w http.ResponseWriter, r *http.Reque
 	}
 
 	user := ctx.Value("user").(database.User)
-	hashedCurrentPassword, _ := hashPassword(currentPassword)
-	log.Printf("current Password:%v ", currentPassword)
-	log.Printf("hashedCurrentPassword: %v ", hashedCurrentPassword)
-	log.Printf("Auth User password: %v ", user.Password)
+	// log.Printf("current Password:%v ", currentPassword)
+	// log.Printf("hashedCurrentPassword: %v ", hashedCurrentPassword)
+	// log.Printf("Auth User password: %v ", user.Password)
 
 	if checkPasswordHash(currentPassword, user.Password) {
 		// current password is wrong
@@ -99,7 +84,7 @@ func (cfg *ApiConfig) HandlerChangePassword(w http.ResponseWriter, r *http.Reque
 	}
 
 	// Update the user in db
-	err = cfg.DB.ChangeUserPassword(
+	err = internal.DB.ChangeUserPassword(
 		ctx,
 		database.ChangeUserPasswordParams{Password: hashedNewPassword, ID: user.ID},
 	)
@@ -119,11 +104,10 @@ func (cfg *ApiConfig) HandlerChangePassword(w http.ResponseWriter, r *http.Reque
 		return
 	}
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
-	return
 	// return something for htmx
 }
 
-func (cfg *ApiConfig) ResetPasswordView(w http.ResponseWriter, r *http.Request) {
+func ResetPasswordView(w http.ResponseWriter, r *http.Request) {
 	// REST: /reset-password/{token}
 	token := chi.URLParam(r, "token")
 	// verify the token
@@ -132,7 +116,7 @@ func (cfg *ApiConfig) ResetPasswordView(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	_, err := verifyToken(token, *cfg)
+	_, err := verifyToken(token, *internal.Config)
 	if err != nil {
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 		log.Println("Failed to parse the token", err)
@@ -142,7 +126,7 @@ func (cfg *ApiConfig) ResetPasswordView(w http.ResponseWriter, r *http.Request) 
 	views.ResetPassword(token).Render(r.Context(), w)
 }
 
-func (cfg *ApiConfig) ResetPassword(w http.ResponseWriter, r *http.Request) {
+func ResetPassword(w http.ResponseWriter, r *http.Request) {
 	// REST: /reset-password
 	ctx := r.Context()
 	r.ParseForm()
@@ -171,7 +155,7 @@ func (cfg *ApiConfig) ResetPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	jwtUserInfo, err := verifyToken(token, *cfg)
+	jwtUserInfo, err := verifyToken(token, *internal.Config)
 	if err != nil {
 		RenderWithMsg(views.ResetPassword(token), w, ctx, []map[string]string{
 			{
@@ -196,7 +180,7 @@ func (cfg *ApiConfig) ResetPassword(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Update the user in db
-	err = cfg.DB.ChangeUserPassword(
+	err = internal.DB.ChangeUserPassword(
 		ctx,
 		database.ChangeUserPasswordParams{Password: hashedPassword, ID: jwtUserInfo.user_id},
 	)
@@ -217,7 +201,7 @@ func (cfg *ApiConfig) ResetPassword(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r.WithContext(ctx), "/login", http.StatusSeeOther)
 }
 
-func (cfg *ApiConfig) ForgotPassword(w http.ResponseWriter, r *http.Request) {
+func ForgotPassword(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	err := r.ParseForm()
@@ -238,7 +222,7 @@ func (cfg *ApiConfig) ForgotPassword(w http.ResponseWriter, r *http.Request) {
 	log.Printf("email from the form: %v", email)
 
 	// Get the user with the provided email
-	user, err := cfg.DB.GetUserByEmail(ctx, email)
+	user, err := internal.DB.GetUserByEmail(ctx, email)
 	if err != nil {
 		log.Println(err)
 		msgs := []map[string]string{
@@ -249,7 +233,7 @@ func (cfg *ApiConfig) ForgotPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tokenString, err := createToken(user, *cfg)
+	tokenString, err := createToken(user, *internal.Config)
 	if err != nil {
 		log.Println("Failed to create token:", err)
 	}
@@ -266,9 +250,9 @@ func (cfg *ApiConfig) ForgotPassword(w http.ResponseWriter, r *http.Request) {
 		ctx,
 		emails.ResetPasswordRequestMail(
 			user.Name,
-			fmt.Sprintf("%v/reset-password/%v", cfg.Config.APP_URL, tokenString),
+			fmt.Sprintf("%v/reset-password/%v", internal.Config.APP_URL, tokenString),
 		),
-		cfg.Config,
+		*internal.Config,
 		mr,
 	)
 	if !ok && err != nil {
@@ -294,11 +278,11 @@ func (cfg *ApiConfig) ForgotPassword(w http.ResponseWriter, r *http.Request) {
 	RenderWithMsg(views.ForgotPassword(), w, ctx, msgs)
 }
 
-func (cfg *ApiConfig) ForgotPasswordView(w http.ResponseWriter, r *http.Request) {
+func ForgotPasswordView(w http.ResponseWriter, r *http.Request) {
 	views.ForgotPassword().Render(r.Context(), w)
 }
 
-func (cfg *ApiConfig) HandlerRegisterView(w http.ResponseWriter, r *http.Request) {
+func HandlerRegisterView(w http.ResponseWriter, r *http.Request) {
 	contextUser := r.Context().Value("user")
 	if contextUser != nil {
 		// Getout you are already loggedin
@@ -309,7 +293,7 @@ func (cfg *ApiConfig) HandlerRegisterView(w http.ResponseWriter, r *http.Request
 	views.Register(map[string]string{}).Render(r.Context(), w)
 }
 
-func (cfg *ApiConfig) HandlerLoginView(w http.ResponseWriter, r *http.Request) {
+func HandlerLoginView(w http.ResponseWriter, r *http.Request) {
 	contextUser := r.Context().Value("user")
 	if contextUser != nil {
 		// Getout you are already loggedin
@@ -320,29 +304,7 @@ func (cfg *ApiConfig) HandlerLoginView(w http.ResponseWriter, r *http.Request) {
 	views.Login().Render(r.Context(), w)
 }
 
-func (params *UserRegisterParams) Validate() bool {
-	params.Errors = make(map[string]string)
-
-	if !rxEmail.Match([]byte(params.Email)) {
-		params.Errors["Email"] = "Please enter a valid email address"
-	}
-
-	if strings.TrimSpace(params.Username) == "" {
-		params.Errors["Username"] = "Please enter a username"
-	}
-	if strings.TrimSpace(params.Name) == "" {
-		params.Errors["Name"] = "Please enter a name"
-	}
-
-	// check for password and password confirmation
-	if params.Password != params.PasswordConfirmation {
-		params.Errors["Password"] = "Password does not match !"
-	}
-
-	return len(params.Errors) == 0
-}
-
-func (cfg *ApiConfig) HandlerLogin(w http.ResponseWriter, r *http.Request) {
+func HandlerLogin(w http.ResponseWriter, r *http.Request) {
 	contextUser := r.Context().Value("user")
 	if contextUser != nil {
 		// Getout you are already loggedin
@@ -369,7 +331,7 @@ func (cfg *ApiConfig) HandlerLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Ge the user by email or username
-	user, err := cfg.DB.GetUserByEmailOrUsername(r.Context(), emailOrUsername)
+	user, err := internal.DB.GetUserByEmailOrUsername(r.Context(), emailOrUsername)
 	if err != nil {
 		log.Println("Failed to get user from the Database", err)
 
@@ -410,7 +372,7 @@ func (cfg *ApiConfig) HandlerLogin(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/posts", http.StatusSeeOther)
 }
 
-func (cfg *ApiConfig) HandlerUsersCreate(w http.ResponseWriter, r *http.Request) {
+func HandlerUsersCreate(w http.ResponseWriter, r *http.Request) {
 	user := r.Context().Value("user")
 	if user != nil {
 		// Getout you are already loggedin
@@ -444,7 +406,7 @@ func (cfg *ApiConfig) HandlerUsersCreate(w http.ResponseWriter, r *http.Request)
 	}
 
 	// Hash the password
-	_, err = cfg.DB.CreateUser(r.Context(), database.CreateUserParams{
+	_, err = internal.DB.CreateUser(r.Context(), database.CreateUserParams{
 		CreatedAt: time.Now().UTC(),
 		UpdatedAt: time.Now().UTC(),
 		Username:  params.Username,
@@ -455,7 +417,7 @@ func (cfg *ApiConfig) HandlerUsersCreate(w http.ResponseWriter, r *http.Request)
 
 	if err != nil {
 		log.Println("Here test", err)
-		// respondWithError(w, http.StatusInternalServerError, "Couldn't create user")
+		// RespondWithError(w, http.StatusInternalServerError, "Couldn't create user")
 		// w.WriteHeader(http.StatusInternalServerError)
 		msgs := []map[string]string{{"msg_type": "error", "msg": "Could not create user"}}
 		ctx := context.WithValue(r.Context(), "msgs", msgs)
@@ -470,12 +432,12 @@ func (cfg *ApiConfig) HandlerUsersCreate(w http.ResponseWriter, r *http.Request)
 	views.Register(params.Errors).Render(ctx, w)
 }
 
-func (cfg *ApiConfig) HandlerUsersGet(w http.ResponseWriter, r *http.Request) {
+func HandlerUsersGet(w http.ResponseWriter, r *http.Request) {
 	user := r.Context().Value("user").(database.User)
-	respondWithJSON(w, http.StatusOK, models.DatabaseUserToUser(user))
+	RespondWithJSON(w, http.StatusOK, models.DatabaseUserToUser(user))
 }
 
-func (cfg *ApiConfig) HandlerLogout(w http.ResponseWriter, r *http.Request) {
+func HandlerLogout(w http.ResponseWriter, r *http.Request) {
 	// Delete the session from the DB
 	log.Println("LogoutHanlder")
 	err := session.SessionManager.Destroy(r.Context())

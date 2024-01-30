@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"context"
@@ -14,7 +14,7 @@ import (
 	"github.com/shtayeb/rssfeed/internal/database"
 )
 
-func startScraping(db *database.Queries, concurrency int, timeBetweenRequest time.Duration) {
+func StartScraping(db *database.Queries, concurrency int, timeBetweenRequest time.Duration) {
 	log.Printf("Collecting feeds every %s on %v goroutines...", timeBetweenRequest, concurrency)
 	ticker := time.NewTicker(timeBetweenRequest)
 

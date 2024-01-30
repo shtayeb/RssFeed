@@ -6,13 +6,14 @@ import (
 	"net/http"
 
 	"github.com/angelofallars/htmx-go"
+	"github.com/shtayeb/rssfeed/internal"
 	"github.com/shtayeb/rssfeed/internal/database"
 	"github.com/shtayeb/rssfeed/views"
 )
 
-func (cfg *ApiConfig) HandlerGetAuthUser(w http.ResponseWriter, r *http.Request) {
+func HandlerGetAuthUser(w http.ResponseWriter, r *http.Request) {
 	user_id := r.Context().Value("user_id").(int32)
-	user, err := cfg.DB.GetUserByAPIKey(r.Context(), user_id)
+	user, err := internal.DB.GetUserByAPIKey(r.Context(), user_id)
 	if err != nil {
 		// failed to get the user
 		log.Println("Faild to get the auth user from user_id in the context")
@@ -26,7 +27,7 @@ func (cfg *ApiConfig) HandlerGetAuthUser(w http.ResponseWriter, r *http.Request)
 		RenderTempl(r.Context(), w, views.UserInfoCard(user))
 }
 
-func (cfg *ApiConfig) HandlerProfileUpdate(w http.ResponseWriter, r *http.Request) {
+func HandlerProfileUpdate(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	user := ctx.Value("user").(database.User)
 	r.ParseForm()
@@ -44,7 +45,7 @@ func (cfg *ApiConfig) HandlerProfileUpdate(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	err := cfg.DB.UpdateUserName(ctx, database.UpdateUserNameParams{Name: name, ID: user.ID})
+	err := internal.DB.UpdateUserName(ctx, database.UpdateUserNameParams{Name: name, ID: user.ID})
 	if err != nil {
 		// failed to update the DB try again
 		msgs := []map[string]string{
@@ -68,7 +69,7 @@ func (cfg *ApiConfig) HandlerProfileUpdate(w http.ResponseWriter, r *http.Reques
 		RenderTempl(ctx, w, views.UserInfoCard(user))
 }
 
-func (cfg *ApiConfig) HanlderUserProfile(w http.ResponseWriter, r *http.Request) {
+func HanlderUserProfile(w http.ResponseWriter, r *http.Request) {
 	contextUser := r.Context().Value("user")
 	if contextUser == nil {
 		// Getout you are already loggedin

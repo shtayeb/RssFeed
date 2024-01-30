@@ -12,7 +12,7 @@ import "bytes"
 
 import "github.com/shtayeb/rssfeed/internal/database"
 import "fmt"
-import "github.com/shtayeb/rssfeed/internal/types"
+import "github.com/shtayeb/rssfeed/http/types"
 
 func postCard(post database.GetPostsForUserRow) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {

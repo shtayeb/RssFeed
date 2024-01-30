@@ -7,12 +7,15 @@ import (
 	"log"
 	"net/http"
 	"net/smtp"
+	"regexp"
+	"strings"
 	"time"
 
 	"github.com/a-h/templ"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/shtayeb/rssfeed/http/types"
 	"github.com/shtayeb/rssfeed/internal/database"
-	"github.com/shtayeb/rssfeed/internal/types"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func paginate(totalData int, limit int, page int) types.Pagination {
@@ -66,7 +69,7 @@ type MailRequest struct {
 func SendEmail(
 	c context.Context,
 	comp templ.Component,
-	appConfig Config,
+	appConfig types.Config,
 	r MailRequest,
 ) (bool, error) {
 	auth := smtp.PlainAuth(
@@ -118,7 +121,7 @@ type JwtUserInfo struct {
 	exp      int64
 }
 
-func createToken(user database.User, cfg ApiConfig) (string, error) {
+func createToken(user database.User, cfg types.Config) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
 		jwt.MapClaims{
 			"username": user.Username,
@@ -127,9 +130,9 @@ func createToken(user database.User, cfg ApiConfig) (string, error) {
 			"exp":      time.Now().Add(time.Minute * 5).Unix(),
 		})
 
-	log.Printf("appkey in the createToken: %v", cfg.Config.AppKey)
+	log.Printf("appkey in the createToken: %v", cfg.APP_KEY)
 
-	tokenString, err := token.SignedString([]byte(cfg.Config.AppKey))
+	tokenString, err := token.SignedString([]byte(cfg.APP_KEY))
 	if err != nil {
 		return "", err
 	}
@@ -137,11 +140,11 @@ func createToken(user database.User, cfg ApiConfig) (string, error) {
 	return tokenString, nil
 }
 
-func verifyToken(tokenString string, cfg ApiConfig) (JwtUserInfo, error) {
+func verifyToken(tokenString string, cfg types.Config) (JwtUserInfo, error) {
 	// log.Printf("token to verifyToken: %v", tokenString)
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		// log.Printf("Token inside keyfunc: %v", token.Claims.(jwt.MapClaims)["email"])
-		return []byte(cfg.Config.AppKey), nil
+		return []byte(cfg.APP_KEY), nil
 	})
 	if err != nil {
 		return JwtUserInfo{}, fmt.Errorf("failed to parse the token: %v", err)
@@ -159,6 +162,40 @@ func verifyToken(tokenString string, cfg ApiConfig) (JwtUserInfo, error) {
 	}
 
 	return JwtUserInfo{}, fmt.Errorf("invalid token")
+}
+
+func hashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	return string(bytes), err
+}
+
+func checkPasswordHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
+}
+
+var rxEmail = regexp.MustCompile(".+@.+\\..+")
+
+func (params *UserRegisterParams) Validate() bool {
+	params.Errors = make(map[string]string)
+
+	if !rxEmail.Match([]byte(params.Email)) {
+		params.Errors["Email"] = "Please enter a valid email address"
+	}
+
+	if strings.TrimSpace(params.Username) == "" {
+		params.Errors["Username"] = "Please enter a username"
+	}
+	if strings.TrimSpace(params.Name) == "" {
+		params.Errors["Name"] = "Please enter a name"
+	}
+
+	// check for password and password confirmation
+	if params.Password != params.PasswordConfirmation {
+		params.Errors["Password"] = "Password does not match !"
+	}
+
+	return len(params.Errors) == 0
 }
 
 // // some generic typing here
