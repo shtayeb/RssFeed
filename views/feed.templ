@@ -8,7 +8,8 @@ templ FollowUnfollowBtn(feedId int32,isFollowing bool) {
 	<button
 		hx-put={ fmt.Sprintf("/feeds/following/%v", feedId) }
 		type="button"
-		class="bg-black text-white rounded-full px-3 py-2"
+		class={ templ.KV("bg-black", !isFollowing),"border border-black text-white rounded-full px-3 py-2" }
+     
 	>
   if isFollowing {
     { "UnFollow" }

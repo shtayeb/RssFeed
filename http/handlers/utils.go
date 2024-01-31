@@ -28,7 +28,7 @@ func paginate(totalData int, limit int, page int) types.Pagination {
 
 	// Calculator Total Page
 	remainder := (totalData % limit)
-	log.Printf("Remainder totalData limit = %v", remainder)
+	// log.Printf("Remainder totalData limit = %v", remainder)
 
 	if remainder == 0 {
 		paginated.TotalPage = totalPage

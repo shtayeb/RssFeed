@@ -195,19 +195,19 @@ func HandlerGetFeeds(w http.ResponseWriter, r *http.Request) {
 
 	// Get the feed ids
 	feedIds := getField("ID", feeds)
-	fmt.Printf("feedids: %v \n", feedIds)
+	// fmt.Printf("feedids: %v \n", feedIds)
 	// get the user following for all the feed iDS
 	user := r.Context().Value("user").(database.User)
 	userFeedFollowings, _ := internal.DB.GetFeedFollowForUser(
 		r.Context(),
 		database.GetFeedFollowForUserParams{
 			UserID:  int32(user.ID),
-			FeedIds: feedIds,
+			Column2: feedIds,
 		},
 	)
 
-	fmt.Printf("user ID: %v \n", user)
-	fmt.Printf("userFollowingFeeds: %v \n", userFeedFollowings)
+	// fmt.Printf("user ID: %v \n", user)
+	fmt.Printf("\n userFollowingFeeds: %v \n \n", userFeedFollowings)
 
 	newFeeds := []types.Feed{}
 
@@ -216,8 +216,10 @@ func HandlerGetFeeds(w http.ResponseWriter, r *http.Request) {
 			Feed: feed,
 		}
 		for _, userFeedFollow := range userFeedFollowings {
+			log.Printf("userFeedFollow.FeedID: %v", userFeedFollow.FeedID)
 			if feed.ID == userFeedFollow.FeedID {
 				newFeed.IsFollowing = true
+				break
 			} else {
 				newFeed.IsFollowing = false
 			}

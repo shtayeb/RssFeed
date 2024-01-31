@@ -5,7 +5,7 @@ WHERE feed_follows.user_id = $1;
 --
 
 -- name: GetFeedFollowForUser :many
-select * from feed_follows where user_id = $1 and feed_id in (sqlc.slice('feedIds'));
+select * from feed_follows where user_id = $1 and feed_id = ANY($2::int[]);
 --
 
 -- name: GetUserFollowingFeed :one

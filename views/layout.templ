@@ -46,7 +46,7 @@ templ userMenuDropdown() {
       From: "transform opacity-100 scale-100"
       To: "transform opacity-0 scale-95"
   -->
-		<div id="user-menu-dropdown" class="hidden absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
+		<div id="user-menu-dropdown" class="hidden absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none border border-gray-400 border-t-transparent " role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
 			<div class="py-1" role="none">
 				<!-- Active: "bg-gray-100 text-gray-900", Not Active: "text-gray-700" -->
 				<a href="/user/profile" class="text-gray-700 block w-full px-4 py-2 text-left text-sm">Profile</a>
@@ -61,6 +61,16 @@ templ userMenuDropdown() {
 					>
 						Sign out
 					</button>
+          <div class="flex flex-col md:hidden px-4 py-2 gap-4 ">
+            // This is the nav items in the mobile viwes 
+            	<a class="text-sm hover:underline underline-offset-4" href="/posts">
+					Posts	
+				</a>
+				<a class="text-sm  hover:underline underline-offset-4" href="/feeds">
+					Feeds
+				</a>
+				<button id="invmode" class="text-sm text-left hover:underline underline-offset-4">Dark Mode</button>
+          </div>
 				</form>
 			</div>
 		</div>
@@ -76,7 +86,8 @@ templ bareLayout() {
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 			<meta name="description" content="RSS feed aggregator"/>
 			<title>RSS Feed</title>
-			<script src="/static/js/htmx.min.js"></script>
+			<script defer src="/static/js/htmx.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
 			<script data-goatcounter="https://rssfeed.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 			<link rel="stylesheet" href="/static/css/styles.css"/>
 		</head>
@@ -100,7 +111,8 @@ templ layout() {
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 			<meta name="description" content="RSS feed aggregator"/>
 			<title>RSS Feed</title>
-			<script src="/static/js/htmx.min.js"></script>
+			<script defer  src="/static/js/htmx.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
 			<script data-goatcounter="https://rssfeed.goatcounter.com/count" async src="//gc.zgo.at/count.js">
       </script>
 			<link rel="stylesheet" href="/static/css/styles.css"/>
@@ -134,14 +146,18 @@ templ navbar() {
 				<h1 class="text-lg md:text-2xl font-bold">TECH FEED</h1>
 			</a>
 			<nav class="ml-auto flex gap-4 items-center sm:gap-6">
+      <div class="hidden md:block gap-6">
+
 				<a class="text-sm font-medium hover:underline underline-offset-4" href="/posts">
 					Posts	
 				</a>
 				<a class="text-sm font-medium hover:underline underline-offset-4" href="/feeds">
-					Feed
+					Feeds
 				</a>
 				<button id="invmode" class="cont-inv text-sm font-medium hover:underline underline-offset-4" tabindex="2">Dark Mode</button>
-				if ctx.Value("user") != nil {
+				
+      </div>
+if ctx.Value("user") != nil {
 					// User Dropdown
 					@userMenuDropdown()
 					// User Dropdown End

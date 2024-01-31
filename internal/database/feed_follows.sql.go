@@ -7,9 +7,9 @@ package database
 
 import (
 	"context"
-	"fmt"
-	"strings"
 	"time"
+
+	"github.com/lib/pq"
 )
 
 const createFeedFollow = `-- name: CreateFeedFollow :one
@@ -26,6 +26,7 @@ type CreateFeedFollowParams struct {
 	FeedID    int32
 }
 
+//
 func (q *Queries) CreateFeedFollow(ctx context.Context, arg CreateFeedFollowParams) (FeedFollow, error) {
 	row := q.db.QueryRowContext(ctx, createFeedFollow,
 		arg.CreatedAt,
@@ -54,6 +55,7 @@ type DeleteFeedFollowParams struct {
 	UserID int32
 }
 
+//
 func (q *Queries) DeleteFeedFollow(ctx context.Context, arg DeleteFeedFollowParams) error {
 	_, err := q.db.ExecContext(ctx, deleteFeedFollow, arg.ID, arg.UserID)
 	return err
@@ -61,32 +63,17 @@ func (q *Queries) DeleteFeedFollow(ctx context.Context, arg DeleteFeedFollowPara
 
 const getFeedFollowForUser = `-- name: GetFeedFollowForUser :many
 
-select id, created_at, updated_at, user_id, feed_id from feed_follows where user_id = $1 and feed_id in ($2)
+select id, created_at, updated_at, user_id, feed_id from feed_follows where user_id = $1 and feed_id = ANY($2::int[])
 `
 
 type GetFeedFollowForUserParams struct {
 	UserID  int32
-	FeedIds []int32
+	Column2 []int32
 }
 
+//
 func (q *Queries) GetFeedFollowForUser(ctx context.Context, arg GetFeedFollowForUserParams) ([]FeedFollow, error) {
-	query := getFeedFollowForUser
-	fmt.Printf("this is query:%v \n\n", query)
-	fmt.Printf("this is params:%v \n \n", arg)
-	var queryParams []interface{}
-	queryParams = append(queryParams, arg.UserID)
-	if len(arg.FeedIds) > 0 {
-		for _, v := range arg.FeedIds {
-			queryParams = append(queryParams, v)
-		}
-		query = strings.Replace(query, "/*SLICE:feedIds*/?", strings.Repeat(",?", len(arg.FeedIds))[1:], 1)
-	} else {
-		query = strings.Replace(query, "/*SLICE:feedIds*/?", "NULL", 1)
-	}
-
-	fmt.Printf("this is query after slice:%v \n \n", query)
-	fmt.Printf("this is queryParams after slice:%v \n \n", queryParams)
-	rows, err := q.db.QueryContext(ctx, query, queryParams...)
+	rows, err := q.db.QueryContext(ctx, getFeedFollowForUser, arg.UserID, pq.Array(arg.Column2))
 	if err != nil {
 		return nil, err
 	}
@@ -171,6 +158,7 @@ type GetUserFollowingFeedParams struct {
 	FeedID int32
 }
 
+//
 func (q *Queries) GetUserFollowingFeed(ctx context.Context, arg GetUserFollowingFeedParams) (FeedFollow, error) {
 	row := q.db.QueryRowContext(ctx, getUserFollowingFeed, arg.UserID, arg.FeedID)
 	var i FeedFollow
