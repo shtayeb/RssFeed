@@ -17,12 +17,11 @@ tailwindcss --input tailwind.css --output test.css --content basic.templ
 ## TODO
 
 ### Not Started 
-- [] Create feed follow/unfollow CRUD
+- [x] Create feed follow/unfollow CRUD
 - [] Create a new post card
 - [] Make the post scrapping more generic to cover more xml formats
 - [] Email notification for your feed - when new post is added
-- [] User followings feeds page
-- [] /user/feeds scoped to the user
+- [] User followings feeds filter 
 - [] Verify new users email
 
 ### Done

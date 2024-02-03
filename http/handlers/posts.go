@@ -10,23 +10,31 @@ import (
 )
 
 func HandlerPostsPage(w http.ResponseWriter, r *http.Request) {
-	// templ.Handler(views.NotFoundComponent()).ServeHTTP(w, r)
 	ctx := r.Context()
 	user := ctx.Value("user").(database.User)
-	limitStr := r.URL.Query().Get("limit")
-	limit := 9
 
-	if specifiedLimit, err := strconv.Atoi(limitStr); err == nil {
-		limit = specifiedLimit
+	limit, err := strconv.Atoi(r.URL.Query().Get("size"))
+	if err != nil {
+		println("err is nil ")
+		limit = 9
+	}
+	page, err := strconv.Atoi(r.URL.Query().Get("page"))
+	if err != nil || page <= 0 {
+		page = 1
 	}
 
 	posts, err := internal.DB.GetPostsForUser(r.Context(), database.GetPostsForUserParams{
 		UserID: user.ID,
 		Limit:  int32(limit),
+		Offset: int32(limit * (page - 1)),
 	})
 	if err != nil {
 		RespondWithError(w, http.StatusInternalServerError, "Couldn't get posts for user")
 		return
 	}
-	views.Posts(posts).Render(ctx, w)
+
+	totalRecordInDB, _ := internal.DB.GetPostForUserCount(r.Context(), user.ID)
+	pagination := paginate(int(totalRecordInDB), limit, page)
+
+	views.Posts(posts, pagination).Render(ctx, w)
 }

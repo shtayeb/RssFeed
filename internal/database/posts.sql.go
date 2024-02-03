@@ -51,19 +51,36 @@ func (q *Queries) CreatePost(ctx context.Context, arg CreatePostParams) (Post, e
 	return i, err
 }
 
+const getPostForUserCount = `-- name: GetPostForUserCount :one
+
+SELECT COUNT(*) FROM posts
+join feed_follows on feed_follows.feed_id = posts.feed_id
+JOIN feeds on feeds.id = feed_follows.feed_id
+WHERE feed_follows.user_id = $1
+`
+
+//
+func (q *Queries) GetPostForUserCount(ctx context.Context, userID int32) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getPostForUserCount, userID)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const getPostsForUser = `-- name: GetPostsForUser :many
 
 SELECT posts.id, posts.created_at, posts.updated_at, posts.title, posts.url, posts.description, posts.published_at, posts.feed_id,feeds.name as feed_name,feeds.url as feed_url FROM posts
-JOIN feed_follows ON feed_follows.feed_id = posts.feed_id
+join feed_follows on feed_follows.feed_id = posts.feed_id
 JOIN feeds on feeds.id = feed_follows.feed_id
 WHERE feed_follows.user_id = $1
 ORDER BY posts.published_at DESC
-LIMIT $2
+LIMIT $2 offset $3
 `
 
 type GetPostsForUserParams struct {
 	UserID int32
 	Limit  int32
+	Offset int32
 }
 
 type GetPostsForUserRow struct {
@@ -81,7 +98,7 @@ type GetPostsForUserRow struct {
 
 //
 func (q *Queries) GetPostsForUser(ctx context.Context, arg GetPostsForUserParams) ([]GetPostsForUserRow, error) {
-	rows, err := q.db.QueryContext(ctx, getPostsForUser, arg.UserID, arg.Limit)
+	rows, err := q.db.QueryContext(ctx, getPostsForUser, arg.UserID, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}

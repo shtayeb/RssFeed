@@ -133,7 +133,7 @@ func UserManagement() templ.Component {
 				templ_7745c5c3_Buffer = templ.GetBuffer()
 				defer templ.ReleaseBuffer(templ_7745c5c3_Buffer)
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<section class=\"max-w-screen-xl px-4 md:px-6 mx-auto\"><div class=\"flex flex-col items-center justify-center\"><div class=\"w-full p-4 \">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<section class=\"max-w-screen-xl md:px-6 mx-auto\"><div class=\"flex flex-col items-center justify-center\"><div class=\"w-full p-4 \">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -141,7 +141,7 @@ func UserManagement() templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div data-orientation=\"horizontal\" role=\"none\" class=\"shrink-0 h-[1px] w-full my-4\"></div><form hx-post=\"/user\" hx-trigger=\"submit\" hx-indicator=\".progress\" hx-swap=\"afterbegin\" hx-target=\"#user-post-message\" class=\"rounded-lg border bg-card text-card-foreground shadow-sm w-full bg-white p-6\" data-v0-t=\"card\" hx-on::after-request=\"this.reset()\"><div class=\"flex flex-col space-y-1.5 \"><h3 class=\"text-2xl font-semibold whitespace-nowrap leading-none tracking-tight\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"shrink-0 h-[1px] w-full my-4\"></div><form hx-post=\"/user\" hx-trigger=\"submit\" hx-indicator=\".progress\" hx-swap=\"afterbegin\" hx-target=\"#user-post-message\" class=\"rounded-lg border bg-card text-card-foreground shadow-sm w-full bg-white p-6\" data-v0-t=\"card\" hx-on::after-request=\"this.reset()\"><div class=\"flex flex-col space-y-1.5 \"><h3 class=\"text-2xl font-semibold whitespace-nowrap leading-none tracking-tight\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -213,43 +213,7 @@ func UserManagement() templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</button></div></form><div data-orientation=\"horizontal\" role=\"none\" class=\"shrink-0 bg-gray-100 h-[1px] w-full my-4\"></div><div class=\"rounded-lg border bg-card text-card-foreground shadow-sm w-full bg-red-200\" data-v0-t=\"card\"><div class=\"flex flex-col space-y-1.5 p-6\"><h3 class=\"text-2xl font-semibold whitespace-nowrap leading-none tracking-tight\">")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Var17 := `Notification Settings`
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var17)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</h3></div><div class=\"p-6 space-y-4\"><div class=\"flex items-center justify-between\"><div>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Var18 := `Email Notifications`
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var18)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div><button type=\"button\" role=\"switch\" aria-checked=\"false\" value=\"on\" class=\"peer inline-flex h-[24px] w-[44px] shrink-0 cursor-pointer items-center border-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-black disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-black data-[state=unchecked]:bg-input ml-auto\"><span data-state=\"unchecked\" class=\"pointer-events-none block h-5 w-5 rounded-full bg-black shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0\"></span></button>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Var19 := `Documents and Settings`
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var19)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" <input aria-hidden=\"true\" tabindex=\"-1\" type=\"checkbox\" value=\"on\" style=\"transform: translateX(-100%); position: absolute; pointer-events: none; opacity: 0; margin: 0px;\"></div><div class=\"flex items-center justify-between\"><div>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Var20 := `Push Notifications`
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var20)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div><button type=\"button\" role=\"switch\" aria-checked=\"false\" value=\"on\" class=\"peer inline-flex h-[24px] w-[44px] shrink-0 cursor-pointer items-center rounded-full border-2   focus-visible:outline-none focus-visible:ring-2  focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-black data-[state=unchecked]:bg-input ml-auto\"><span data-state=\"unchecked\" class=\"pointer-events-none block h-5 w-5 rounded-full bg-black shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0\"></span></button> <input aria-hidden=\"true\" tabindex=\"-1\" type=\"checkbox\" value=\"on\" style=\"\"></div></div></div></div></div></section>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</button></div></form><div data-orientation=\"horizontal\" role=\"none\" class=\"shrink-0 bg-gray-100 h-[1px] w-full my-4\"></div></div></div></section>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -258,7 +222,7 @@ func UserManagement() templ.Component {
 			}
 			return templ_7745c5c3_Err
 		})
-		templ_7745c5c3_Err = layout().Render(templ.WithChildren(ctx, templ_7745c5c3_Var8), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = layout("Profile").Render(templ.WithChildren(ctx, templ_7745c5c3_Var8), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

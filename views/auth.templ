@@ -1,7 +1,7 @@
 package views
 
 templ ResetPassword(token string) {
-	@bareLayout() {
+	@bareLayout("Reset Password") {
 		<div class="bg-gray-100 min-h-screen flex items-center justify-center">
 			<div class="max-w-sm rounded-lg shadow bg-white p-6 space-y-6 border">
 				<div class="space-y-2 text-center">
@@ -37,7 +37,7 @@ templ ResetPassword(token string) {
 }
 
 templ ForgotPassword() {
-	@bareLayout() {
+	@bareLayout("Forgot Password") {
 		<div class="bg-gray-100 min-h-screen flex items-center justify-center">
 			<div class="max-w-sm rounded-lg shadow bg-white p-6 space-y-6 border">
 				<div class="space-y-2 text-center">
@@ -79,7 +79,7 @@ templ ForgotPassword() {
 }
 
 templ Login() {
-	@bareLayout() {
+	@bareLayout("Login") {
 		<div class="bg-gray-100 min-h-screen flex items-center justify-center">
 			<div class="max-w-sm rounded-lg shadow bg-white p-6 space-y-6 border">
 				<div class="space-y-2 text-center">
@@ -162,7 +162,7 @@ templ Login() {
 }
 
 templ Register(errors map[string]string) {
-	@bareLayout() {
+	@bareLayout("Register") {
 		<div class="bg-gray-100 min-h-screen flex items-center justify-center ">
 			<div class="max-w-sm rounded-lg shadow bg-white p-6 space-y-6">
 				<div class="space-y-2 text-center">

@@ -7,7 +7,7 @@ import "github.com/shtayeb/rssfeed/http/types"
 templ postCard(post database.GetPostsForUserRow) {
 	<div class="border bg-white border-gray-200 shadow-sm rounded-lg p-4">
 		<a href={ templ.URL(post.Url) } class="" target="_blank">
-			<h2 class="text-xl font-bold mb-2">{ post.Title }</h2>
+			<h2 class="text-lg text-gray-800 font-bold mb-2">{ post.Title }</h2>
 		</a>
 		<p class="text-sm text-gray-500 mb-2">{ post.PublishedAt.Time.Format("2006-01-02") }</p>
 		<a href={ templ.URL(post.FeedUrl) }>
@@ -18,32 +18,32 @@ templ postCard(post database.GetPostsForUserRow) {
 }
 
 templ Pagination(pagination types.Pagination) {
-	<div class="flex justify-center mt-8 space-x-4">
-		<a href={ templ.URL(pagination.PrevPageUrl) } class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
+	<div class="flex flex-col md:flex-row justify-center items-center mt-8 gap-4">
+		<a href={ templ.URL(pagination.PrevPageUrl) } class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border bg-white h-10 px-4 py-2">
 			Previous
 		</a>
-		<div class="flex space-x-2">
-			<a href={ templ.URL(pagination.FirstPageUrl) } class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2">
+		<div class="flex gap-2">
+			<a href={ templ.URL(pagination.FirstPageUrl) } class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-white disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2">
 				1	
 			</a>
-			<button class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
+			<button class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-white hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
 				{ fmt.Sprintf("Page %v of %v",pagination.CurrentPage,pagination.TotalPage) }
 			</button>
-			<a href={ templ.URL(pagination.LastPageUrl) } class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
+			<a href={ templ.URL(pagination.LastPageUrl) } class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-white h-10 px-4 py-2">
 				{ fmt.Sprintf("%v",pagination.TotalPage) }
 			</a>
 		</div>
-		<a href={ templ.URL(pagination.NextPageUrl) } class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
+		<a href={ templ.URL(pagination.NextPageUrl) } class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors  focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-white h-10 px-4 py-2">
 			Next
 		</a>
 	</div>
 }
 
 templ FeedPosts(feed database.Feed,posts []database.GetPostsForUserRow,pagination types.Pagination) {
-	@layout() {
+	@layout(fmt.Sprintf("%v Posts",feed.Name)) {
 		<section class="max-w-screen-xl mx-auto px-4 md:px-6">
 			<div class="py-8">
-				<h2 class="text-3xl font-bold mb-6">{ feed.Name } Posts:</h2>
+				<h2 class="text-2xl font-bold mb-6">{ feed.Name } Posts:</h2>
 				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 					for _,post:= range posts {
 						@postCard(post)
@@ -56,17 +56,17 @@ templ FeedPosts(feed database.Feed,posts []database.GetPostsForUserRow,paginatio
 	}
 }
 
-templ Posts(posts []database.GetPostsForUserRow) {
-	@layout() {
+templ Posts(posts []database.GetPostsForUserRow,pagination types.Pagination) {
+	@layout("Your Feeds Posts") {
 		<section class="max-w-screen-xl mx-auto px-4 md:px-6">
 			<div class="py-8">
-				<h2 class="text-3xl font-bold mb-6">{ ctx.Value("user").(database.User).Name }:  Latest Posts</h2>
+				<h2 class="text-2xl font-bold mb-6">Your feeds latest posts</h2>
 				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 					for _,post:= range posts {
 						@postCard(post)
 					}
 				</div>
-				// @Pagination(pagination)
+				 @Pagination(pagination)
 			</div>
 		</section>
 	}

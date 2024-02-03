@@ -27,7 +27,7 @@ func FollowUnfollowBtn(feedId int32, isFollowing bool) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		var templ_7745c5c3_Var2 = []any{templ.KV("bg-black", !isFollowing), "border border-black text-white rounded-full px-3 py-2"}
+		var templ_7745c5c3_Var2 = []any{templ.KV("bg-black text-white", !isFollowing), "border border-black rounded-full px-3 py-2"}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var2...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -40,7 +40,7 @@ func FollowUnfollowBtn(feedId int32, isFollowing bool) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" type=\"button\" class=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" type=\"button\" hx-swap=\"outerHTML\" class=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -56,7 +56,7 @@ func FollowUnfollowBtn(feedId int32, isFollowing bool) templ.Component {
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs("UnFollow")
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views\feed.templ`, Line: 14, Col: 16}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views\feed.templ`, Line: 15, Col: 16}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -66,7 +66,7 @@ func FollowUnfollowBtn(feedId int32, isFollowing bool) templ.Component {
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs("Follow")
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views\feed.templ`, Line: 16, Col: 14}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views\feed.templ`, Line: 17, Col: 14}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
@@ -139,7 +139,7 @@ func AllFeeds(feeds []types.Feed, pagination types.Pagination) templ.Component {
 				var templ_7745c5c3_Var9 string
 				templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(feed.Feed.Name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views\feed.templ`, Line: 34, Col: 55}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views\feed.templ`, Line: 35, Col: 55}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 				if templ_7745c5c3_Err != nil {
@@ -184,7 +184,7 @@ func AllFeeds(feeds []types.Feed, pagination types.Pagination) templ.Component {
 			}
 			return templ_7745c5c3_Err
 		})
-		templ_7745c5c3_Err = layout().Render(templ.WithChildren(ctx, templ_7745c5c3_Var6), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = layout("Feeds").Render(templ.WithChildren(ctx, templ_7745c5c3_Var6), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -223,7 +223,7 @@ func FeedLi(feedFollow database.GetFeedFollowsForUserRow) templ.Component {
 		var templ_7745c5c3_Var12 string
 		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(feedFollow.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views\feed.templ`, Line: 52, Col: 49}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views\feed.templ`, Line: 53, Col: 49}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 		if templ_7745c5c3_Err != nil {
@@ -236,7 +236,7 @@ func FeedLi(feedFollow database.GetFeedFollowsForUserRow) templ.Component {
 		var templ_7745c5c3_Var13 string
 		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(feedFollow.Url)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views\feed.templ`, Line: 53, Col: 48}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views\feed.templ`, Line: 54, Col: 48}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 		if templ_7745c5c3_Err != nil {
@@ -388,7 +388,7 @@ func Feeds(feeds []database.GetFeedFollowsForUserRow) templ.Component {
 			}
 			return templ_7745c5c3_Err
 		})
-		templ_7745c5c3_Err = layout().Render(templ.WithChildren(ctx, templ_7745c5c3_Var16), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = layout("Your Feeds").Render(templ.WithChildren(ctx, templ_7745c5c3_Var16), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

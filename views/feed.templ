@@ -8,7 +8,8 @@ templ FollowUnfollowBtn(feedId int32,isFollowing bool) {
 	<button
 		hx-put={ fmt.Sprintf("/feeds/following/%v", feedId) }
 		type="button"
-		class={ templ.KV("bg-black", !isFollowing),"border border-black text-white rounded-full px-3 py-2" }
+    hx-swap="outerHTML"
+		class={ templ.KV("bg-black text-white", !isFollowing),"border border-black rounded-full px-3 py-2" }
      
 	>
   if isFollowing {
@@ -23,7 +24,7 @@ templ FollowUnfollowBtn(feedId int32,isFollowing bool) {
 }
 
 templ AllFeeds(feeds []types.Feed,pagination types.Pagination) {
-	@layout() {
+	@layout("Feeds") {
 		<section class="max-w-screen-xl mx-auto px-4 md:px-6">
 			<div class="py-8">
 				<h2 class="text-3xl font-bold mb-6">All Feeds</h2>
@@ -85,7 +86,7 @@ templ FeedLi(feedFollow database.GetFeedFollowsForUserRow) {
 }
 
 templ Feeds(feeds []database.GetFeedFollowsForUserRow) {
-	@layout() {
+	@layout("Your Feeds") {
 		<div class="grid grid-cols-1 lg:grid-cols-1 gap-6 py-6 max-w-screen-xl mx-auto px-4 md:px-6">
 			<div class="max-h-96 bg-white  rounded-lg border shadow-sm" data-v0-t="card">
 				<div class="flex flex-col space-y-1.5 p-6">

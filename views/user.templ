@@ -29,12 +29,12 @@ templ SuccessPartial() {
 }
 
 templ UserManagement() {
-	@layout() {
-		<section class="max-w-screen-xl px-4 md:px-6 mx-auto">
+	@layout("Profile") {
+		<section class="max-w-screen-xl md:px-6 mx-auto">
 			<div class="flex flex-col items-center justify-center">
 				<div class="w-full p-4 ">
 					@UserInfoCard(ctx.Value("user").(database.User))
-					<div data-orientation="horizontal" role="none" class="shrink-0 h-[1px] w-full my-4"></div>
+					<div class="shrink-0 h-[1px] w-full my-4"></div>
 					// Edit profile form
 					<form hx-post="/user" hx-trigger="submit" hx-indicator=".progress" hx-swap="afterbegin" hx-target="#user-post-message" class="rounded-lg border bg-card text-card-foreground shadow-sm w-full bg-white p-6" data-v0-t="card" hx-on::after-request="this.reset()">
 						<div class="flex flex-col space-y-1.5 ">
@@ -83,25 +83,6 @@ templ UserManagement() {
 					// End of password change
 					<div data-orientation="horizontal" role="none" class="shrink-0 bg-gray-100 h-[1px] w-full my-4"></div>
 					// Start of the notification form 
-					<div class="rounded-lg border bg-card text-card-foreground shadow-sm w-full bg-red-200" data-v0-t="card">
-						<div class="flex flex-col space-y-1.5 p-6">
-							<h3 class="text-2xl font-semibold whitespace-nowrap leading-none tracking-tight">Notification Settings</h3>
-						</div>
-						<div class="p-6 space-y-4">
-							<div class="flex items-center justify-between">
-								<div>Email Notifications</div>
-								<button type="button" role="switch" aria-checked="false" value="on" class="peer inline-flex h-[24px] w-[44px] shrink-0 cursor-pointer items-center border-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-black disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-black data-[state=unchecked]:bg-input ml-auto">
-									<span data-state="unchecked" class="pointer-events-none block h-5 w-5 rounded-full bg-black shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0"></span>
-								</button>Documents and Settings
-								<input aria-hidden="true" tabindex="-1" type="checkbox" value="on" style="transform: translateX(-100%); position: absolute; pointer-events: none; opacity: 0; margin: 0px;"/>
-							</div>
-							<div class="flex items-center justify-between">
-								<div>Push Notifications</div>
-								<button type="button" role="switch" aria-checked="false" value="on" class="peer inline-flex h-[24px] w-[44px] shrink-0 cursor-pointer items-center rounded-full border-2   focus-visible:outline-none focus-visible:ring-2  focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-black data-[state=unchecked]:bg-input ml-auto"><span data-state="unchecked" class="pointer-events-none block h-5 w-5 rounded-full bg-black shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0"></span></button>
-								<input aria-hidden="true" tabindex="-1" type="checkbox" value="on" style=""/>
-							</div>
-						</div>
-					</div>
 				</div>
 			</div>
 		</section>
