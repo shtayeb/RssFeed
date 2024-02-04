@@ -146,11 +146,11 @@ templ Login() {
 						</div>
 					</div>
 					<div class="flex items-center space-x-2">
-						<hr class="flex-grow border-zinc-200 dark:border-zinc-700"/>
-						<span class="text-zinc-400 dark:text-zinc-300 text-sm">OR</span>
-						<hr class="flex-grow border-zinc-200 dark:border-zinc-700"/>
+						<hr class="flex-grow border-zinc-200"/>
+						<span class="text-zinc-400 text-sm">OR</span>
+						<hr class="flex-grow border-zinc-200 "/>
 					</div>
-					<a href="/register" class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input hover:bg-gray-100 hover:text-accent-foreground h-10 px-4 py-2 w-full ">
+					<a href="/register" class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-gray-900 hover:bg-gray-100 h-10 px-4 py-2 w-full ">
 						<div class="flex items-center justify-center">
 							Register
 						</div>
@@ -234,11 +234,10 @@ templ Register(errors map[string]string) {
 								Username
 							</label>
 							<input
-								type="username"
-								class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+								type="text"
+								class="flex h-10 w-full rounded-md px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
 								id="username"
 								name="username"
-								value=""
 								placeholder="example"
 							/>
 							<p class="text-red-400 text-xs py-1">

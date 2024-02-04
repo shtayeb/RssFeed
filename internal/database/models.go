@@ -27,6 +27,13 @@ type FeedFollow struct {
 	FeedID    int32
 }
 
+type Newsletter struct {
+	ID        int32
+	Email     string
+	UpdatedAt time.Time
+	CreatedAt time.Time
+}
+
 type Post struct {
 	ID          int32
 	CreatedAt   time.Time

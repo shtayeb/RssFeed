@@ -25,7 +25,6 @@ if (darkModeToggleBtn) {
 const userMenuDropdown = document.querySelector("#user-menu-dropdown-btn");
 if (userMenuDropdown) {
 	userMenuDropdown.addEventListener("click", () => {
-		console.log("dropdown clicked");
 		document.querySelector("#user-menu-dropdown").classList.toggle("hidden");
 	});
 }

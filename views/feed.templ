@@ -14,7 +14,7 @@ templ FollowUnfollowBtn(feedId int32,isFollowing bool) {
 	>
   if isFollowing {
     { "UnFollow" }
-  }else{
+  } else {
     { "Follow" }
   }
 	</button>
@@ -61,7 +61,7 @@ templ FeedLi(feedFollow database.GetFeedFollowsForUserRow) {
 				hx-indicator=".progress"
 				hx-confirm="Are you sure?"
 				hx-put={ fmt.Sprintf("/feeds/following/%v", feedFollow.FeedID) }
-				class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-red-400 hover:bg-accent hover:text-accent-foreground h-10 w-10"
+				class="inline-flex items-center justify-center rounded-md text-sm font-medium  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border bg-red-300/80 hover:bg-red-300 border-red-500/90 h-10 w-10"
 			>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
@@ -98,7 +98,7 @@ templ Feeds(feeds []database.GetFeedFollowsForUserRow) {
 						<div class="w-full">
 							<input
 								required
-								class="flex h-10 w-full rounded-md border-2 bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+								class="flex h-10 w-full rounded-md border px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
 								id="name"
 								placeholder="Enter feed's name"
 								name="name"
@@ -107,7 +107,7 @@ templ Feeds(feeds []database.GetFeedFollowsForUserRow) {
 						<div class="w-full">
 							<input
 								required
-								class="flex h-10 w-full rounded-md border-2 border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+								class="flex h-10 w-full rounded-md border px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
 								id="url"
 								placeholder="Enter feed's url"
 								type="url"

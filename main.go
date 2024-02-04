@@ -52,6 +52,8 @@ func main() {
 		r.Get("/forgot-password", handlers.ForgotPasswordView)
 		r.Post("/forgot-password", handlers.ForgotPassword)
 
+		r.Post("/newsletters", handlers.StoreNewsLetter)
+
 		r.Post("/reset-password", handlers.ResetPassword)
 		r.Get("/reset-password/{token}", handlers.ResetPasswordView)
 
